@@ -1,0 +1,29 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Adds spacing between sections */
+  padding-bottom: 2rem; /* Prevents overlap with footer */
+}
+
+.error-message {
+  margin-bottom: 1rem; /* Ensures error messages don’t overlap */
+}
+
+.footer {
+  margin-top: auto; /* Push footer to the bottom */
+}

@@ -1,0 +1,42 @@
+<div class="dashboard-container">
+    <header class="dashboard-header">
+      <h1>MySQL Proxy Scenarios Dashboard</h1>
+      <div class="refresh-indicator" [class.active]="loading">
+        <span class="refresh-icon">⟳</span>
+        <span class="refresh-text">Auto-refreshing every 5s</span>
+      </div>
+    </header>
+  
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+      <button (click)="error = ''" class="close-button">×</button>
+    </div>
+  
+    <!-- Metrics Overview -->
+    <div class="metrics-overview">
+      <div class="metric-card">
+        <h3>Packet Loss</h3>
+        <div class="chart-container">
+          <canvas #packetLossChart></canvas>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <h3>Latency</h3>
+        <div class="chart-container">
+          <canvas #latencyChart></canvas>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <h3>Query Load</h3>
+        <div class="chart-container">
+          <canvas #queryLoadChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    
+  </div>
+  
+  
