@@ -1,0 +1,95 @@
+<div class="container mt-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h2>Database Configuration</h2>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="dbConfigForm" (ngSubmit)="onSubmit()">
+          <div class="form-group mb-3">
+            <label for="databaseType">Database Type</label>
+            <select id="databaseType" formControlName="databaseType" class="form-control">
+              <option *ngFor="let type of dbTypes" [value]="type.name">{{ type.name }}</option>
+            </select>
+          </div>
+  
+          <div class="row">
+            <div class="form-group col-md-4 mb-3">
+              <label for="host">Host</label>
+              <input type="text" id="host" formControlName="host" class="form-control"
+                [attr.disabled]="dbConfigForm.get('useCustomUrl')?.value ? true : null">
+              <div *ngIf="dbConfigForm.get('host')?.invalid && dbConfigForm.get('host')?.touched" class="text-danger">
+                Host is required
+              </div>
+            </div>
+  
+            <div class="form-group col-md-4 mb-3">
+              <label for="port">Port</label>
+              <input type="text" id="port" formControlName="port" class="form-control"
+                [attr.disabled]="dbConfigForm.get('useCustomUrl')?.value ? true : null">
+              <div *ngIf="dbConfigForm.get('port')?.invalid && dbConfigForm.get('port')?.touched" class="text-danger">
+                Port is required
+              </div>
+            </div>
+  
+            <div class="form-group col-md-4 mb-3">
+              <label for="databaseName">Database Name</label>
+              <input type="text" id="databaseName" formControlName="databaseName" class="form-control"
+                [attr.disabled]="dbConfigForm.get('useCustomUrl')?.value ? true : null">
+              <div *ngIf="dbConfigForm.get('databaseName')?.invalid && dbConfigForm.get('databaseName')?.touched" class="text-danger">
+                Database name is required
+              </div>
+            </div>
+          </div>
+  
+          <div class="form-check mb-3">
+            <input type="checkbox" id="useCustomUrl" formControlName="useCustomUrl" class="form-check-input">
+            <label for="useCustomUrl" class="form-check-label">Use Custom JDBC URL</label>
+          </div>
+  
+          <div class="form-group mb-3">
+            <label for="customUrl">JDBC URL</label>
+            <input type="text" id="customUrl" formControlName="customUrl" class="form-control"
+              [attr.readonly]="!dbConfigForm.get('useCustomUrl')?.value ? true : null">
+            <div *ngIf="dbConfigForm.get('customUrl')?.invalid && dbConfigForm.get('customUrl')?.touched" class="text-danger">
+              JDBC URL is required
+            </div>
+          </div>
+  
+          <div class="row">
+            <div class="form-group col-md-6 mb-3">
+              <label for="username">Username</label>
+              <input type="text" id="username" formControlName="username" class="form-control">
+              <div *ngIf="dbConfigForm.get('username')?.invalid && dbConfigForm.get('username')?.touched" class="text-danger">
+                Username is required
+              </div>
+            </div>
+  
+            <div class="form-group col-md-6 mb-3">
+              <label for="password">Password</label>
+              <input type="password" id="password" formControlName="password" class="form-control">
+              <div *ngIf="dbConfigForm.get('password')?.invalid && dbConfigForm.get('password')?.touched" class="text-danger">
+                Password is required
+              </div>
+            </div>
+          </div>
+  
+          <input type="hidden" formControlName="generatedUrl">
+  
+          <div *ngIf="message" class="alert mt-3" [ngClass]="{'alert-success': !isError, 'alert-danger': isError}">
+            {{ message }}
+          </div>
+  
+          <div class="d-flex mt-4 flex-wrap">
+            <button type="submit" class="btn btn-primary me-2 mb-2" [disabled]="dbConfigForm.invalid || isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              Save Configuration
+            </button>
+            <button type="button" class="btn btn-secondary me-2 mb-2" (click)="testConnection()" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              Test Connection
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

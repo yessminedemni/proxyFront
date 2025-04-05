@@ -656,4 +656,3 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
       })
   }
 }
-
