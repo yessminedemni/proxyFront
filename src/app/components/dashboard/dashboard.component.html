@@ -1,51 +1,60 @@
 <div class="dashboard">
-    <div class="dashboard-header">
-      <h1>Chaos Scenarios</h1>
-      <p>Control and monitor your MySQL proxy chaos scenarios</p>
-      
-      <div class="actions">
-        <button class="refresh-btn" (click)="refreshScenarios()" [disabled]="refreshing">
-          <i class="fas" [ngClass]="refreshing ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
-          {{ refreshing ? 'Refreshing...' : 'Refresh' }}
-        </button>
-      </div>
+  <div class="dashboard-header">
+    <h1>Chaos Scenarios</h1>
+    <p>Control and monitor your MySQL proxy chaos scenarios</p>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+      <input
+  type="text"
+  [(ngModel)]="searchTerm"
+  placeholder="Search scenarios..."
+/>
+
+      <i class="fas fa-search"></i>
     </div>
-  
-    <div *ngIf="loading" class="loading-container">
-      <div class="spinner"></div>
-      <p>Loading scenarios...</p>
-    </div>
-  
-    <div *ngIf="error" class="error-message">
-      <i class="fas fa-exclamation-triangle"></i>
-      <p>{{ error }}</p>
-      <button (click)="loadScenarios()">Try Again</button>
-    </div>
-  
-    <div *ngIf="!loading && !error" class="scenarios-container">
-      <div *ngIf="scenarios.length === 0" class="no-scenarios">
-        <i class="fas fa-info-circle"></i>
-        <p>No scenarios found. Please check your backend configuration.</p>
-      </div>
-  
-      <app-scenario-card 
-  *ngFor="let scenario of scenarios" 
-  [scenario]="scenario"
-  (toggled)="onScenarioToggled($event)"
-></app-scenario-card>
-    </div>
-  
-    <div class="dashboard-info">
-      <div class="info-card">
-        <h3><i class="fas fa-info-circle"></i> About Chaos Testing</h3>
-        <p>Chaos testing is the process of deliberately introducing failures in a system to test its resilience and identify weaknesses.</p>
-      </div>
-      
-      <div class="info-card">
-        <h3><i class="fas fa-exclamation-triangle"></i> Warning</h3>
-        <p>These scenarios can impact your database performance. Use with caution in production environments.</p>
-      </div>
+
+    <div class="actions">
+      <button class="refresh-btn" (click)="refreshScenarios()" [disabled]="refreshing">
+        <i class="fas" [ngClass]="refreshing ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+        {{ refreshing ? 'Refreshing...' : 'Refresh' }}
+      </button>
     </div>
   </div>
-  
-  
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading scenarios...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button (click)="loadScenarios()">Try Again</button>
+  </div>
+
+  <div *ngIf="!loading && !error" class="scenarios-container">
+    <div *ngIf="filteredScenarios.length === 0" class="no-scenarios">
+      <i class="fas fa-info-circle"></i>
+      <p>No scenarios found. Please check your backend configuration.</p>
+    </div>
+
+    <app-scenario-card 
+      *ngFor="let scenario of filteredScenarios" 
+      [scenario]="scenario"
+      (toggled)="onScenarioToggled($event)"
+    ></app-scenario-card>
+  </div>
+
+  <div class="dashboard-info">
+    <div class="info-card">
+      <h3><i class="fas fa-info-circle"></i> About Chaos Testing</h3>
+      <p>Chaos testing is the process of deliberately introducing failures in a system to test its resilience and identify weaknesses.</p>
+    </div>
+
+    <div class="info-card">
+      <h3><i class="fas fa-exclamation-triangle"></i> Warning</h3>
+      <p>These scenarios can impact your database performance. Use with caution in production environments.</p>
+    </div>
+  </div>
+</div>

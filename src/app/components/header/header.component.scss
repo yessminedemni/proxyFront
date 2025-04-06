@@ -77,6 +77,22 @@
         }
       }
     }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #2ecc71; // green
+      gap: 0.5rem;
+    
+      .dot {
+        width: 10px;
+        height: 10px;
+        background-color: #2ecc71;
+        border-radius: 50%;
+      }
+    }
+    
   }
   
   

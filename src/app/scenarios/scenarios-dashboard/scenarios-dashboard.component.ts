@@ -4,6 +4,7 @@ import { switchMap, startWith, catchError } from "rxjs/operators"
 import Chart from "chart.js/auto"
 import {  HttpClient, HttpClientModule } from "@angular/common/http"
 import { CommonModule } from "@angular/common"
+import { FormsModule } from "@angular/forms"
 
 interface Scenario {
   name: string
@@ -26,7 +27,7 @@ interface ScenarioMetrics {
   selector: "app-scenarios-dashboard",
   templateUrl: "./scenarios-dashboard.component.html",
   styleUrls: ["./scenarios-dashboard.component.scss"],
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule,FormsModule],
   standalone: true,
 })
 export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
@@ -38,7 +39,9 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
   loading = true
   error = ""
   refreshInterval = 5000 // 5 seconds
-  activeTab = "metrics" // Default active tab
+  activeTab = "metrics" //
+  searchTerm: string = '';
+  
 
   // Charts
   packetLossChart: Chart | undefined
@@ -51,6 +54,7 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
     latency: [],
     queryLoad: [],
   }
+  
 
   // Thresholds for metrics
   thresholds = {
@@ -68,10 +72,13 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
     packet_loss: "Simulates network packet loss between client and server",
     latency_injection: "Adds artificial delay to database responses based on query type",
   }
+  lastUpdated: Date | null = null; // Declare and initialize lastUpdated
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.updateLastUpdated();
+
     // Set up automatic refresh for scenarios
     interval(this.refreshInterval)
       .pipe(
@@ -108,6 +115,20 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
         },
       })
   }
+  updateLastUpdated(): void {
+    this.lastUpdated = new Date();
+  }
+
+  // You'll likely call this method whenever your data is refreshed
+  refreshData(): void {
+    this.loading = true;
+    // ... your logic to fetch or update data
+    setTimeout(() => {
+      this.loading = false;
+      this.updateLastUpdated(); // Update the timestamp after successful refresh
+      // ... process your data
+    }, 1500); // Example delay
+  }
 
   ngAfterViewInit(): void {
     this.initializeCharts()
@@ -119,6 +140,12 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
     if (metricData.length === 0) return 0
     return metricData[metricData.length - 1].value
   }
+  
+  matchesSearch(label: string): boolean {
+    return label.toLowerCase().includes(this.searchTerm.toLowerCase());
+  }
+  
+  
 
   initializeCharts(): void {
     // Initialize Packet Loss Chart with enhanced configuration

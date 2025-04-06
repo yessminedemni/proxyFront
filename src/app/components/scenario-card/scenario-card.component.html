@@ -1,46 +1,45 @@
 <div class="scenario-card" [ngClass]="{'enabled': scenario.enabled}">
-    <div class="scenario-icon">
-      <i class="fas" [ngClass]="getScenarioIcon()"></i>
-    </div>
-    
-    <div class="scenario-content">
-      <div class="scenario-header">
-        <h3>{{ getFormattedName() }}</h3>
-        <div class="scenario-meta">
-          <span class="category" *ngIf="scenario.category">
-            <i class="fas" [ngClass]="getCategoryIcon()"></i>
-            {{ scenario.category }}
-          </span>
-          <span class="impact" *ngIf="scenario.impact" [ngClass]="getImpactClass()">
-            {{ scenario.impact }}
-          </span>
-        </div>
-      </div>
-      
-      <p class="scenario-description">{{ scenario.description || 'No description available' }}</p>
-      
-      <div class="scenario-footer">
-        <div class="status-indicator" [ngClass]="{'enabled': scenario.enabled}">
-          <span class="status-dot"></span>
-          <span class="status-text">{{ scenario.enabled ? 'Enabled' : 'Disabled' }}</span>
-        </div>
-        
-        <button 
-          class="toggle-btn" 
-          [ngClass]="{'enabled': scenario.enabled}"
-          (click)="toggleScenario()" 
-          [disabled]="isToggling"
-        >
-          <i *ngIf="isToggling" class="fas fa-spinner fa-spin"></i>
-          <span *ngIf="!isToggling">{{ scenario.enabled ? 'Disable' : 'Enable' }}</span>
-          <span *ngIf="isToggling">{{ scenario.enabled ? 'Disabling...' : 'Enabling...' }}</span>
-        </button>
-      </div>
-      
-      <div *ngIf="error" class="error-message">
-        {{ error }}
-      </div>
-    </div>
+  <div class="scenario-icon">
+    <i class="fas" [ngClass]="getScenarioIcon()"></i>
   </div>
   
-  
+  <div class="scenario-content">
+    <div class="scenario-header">
+      <h3>{{ getFormattedName() }}</h3>
+      <div class="scenario-meta">
+        <span class="category" *ngIf="scenario.category">
+          <i class="fas" [ngClass]="getCategoryIcon()"></i>
+          {{ scenario.category }}
+        </span>
+        <span class="impact" *ngIf="scenario.impact" [ngClass]="getImpactClass()">
+          {{ scenario.impact }}
+        </span>
+      </div>
+    </div>
+    
+    <p class="scenario-description">{{ scenario.description || 'No description available' }}</p>
+    
+    <div class="scenario-footer">
+      <div class="status-indicator" [ngClass]="{'enabled': scenario.enabled}">
+        <span class="status-dot"></span>
+        <span class="status-text">{{ scenario.enabled ? 'Enabled' : 'Disabled' }}</span>
+      </div>
+      
+      <button 
+        class="toggle-btn" 
+        [ngClass]="{'enabled': scenario.enabled}"
+        (click)="toggleScenario()" 
+        [disabled]="isToggling"
+      >
+        <i *ngIf="isToggling" class="fas fa-spinner fa-spin"></i>
+        <span *ngIf="!isToggling">{{ scenario.enabled ? 'Disable' : 'Enable' }}</span>
+        <span *ngIf="isToggling">{{ scenario.enabled ? 'Disabling...' : 'Enabling...' }}</span>
+      </button>
+    </div>
+    
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+  </div>
+</div>
+

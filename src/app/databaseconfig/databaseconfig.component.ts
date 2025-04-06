@@ -4,6 +4,8 @@ import { CommonModule } from "@angular/common"
 import { HttpClientModule } from "@angular/common/http"
 import { DatabaseConfigService } from "../services/database-config.service"
 import { MySQLProxyService } from "../services/MySQLProxyService .service"
+import { Router } from "@angular/router"; // Import the Router
+
 
 @Component({
   selector: "app-databaseconfig",
@@ -38,7 +40,10 @@ export class DatabaseconfigComponent implements OnInit {
     private fb: FormBuilder,
     private databaseConfigService: DatabaseConfigService,
     private proxyService: MySQLProxyService,
+     private router: Router // Inject the Router
+
   ) {}
+ 
 
   ngOnInit(): void {
     this.dbConfigForm = this.fb.group({
@@ -291,29 +296,30 @@ export class DatabaseconfigComponent implements OnInit {
 
   testConnection() {
     if (this.dbConfigForm.valid) {
-      this.isLoading = true
-      const payload = this.buildPayload()
-
-      console.log("Testing connection with:", payload)
-
-      this.databaseConfigService.testConnection(payload).subscribe({
-        next: (response) => {
-          console.log("Connection test successful:", response)
-          this.message = "Connection successful! Configuration stored."
-          this.isError = false
-          this.isLoading = false
-        },
-        error: (err) => {
-          console.error("Connection test failed:", err)
-          this.message = "Connection failed: " + (err.error?.message || err.message || "Unknown error")
-          this.isError = true
-          this.isLoading = false
-        },
-      })
+    this.isLoading = true;
+    const payload = this.buildPayload();
+    
+    console.log("Testing connection with:", payload);
+    
+    this.databaseConfigService.testConnection(payload).subscribe({
+    next: (response) => {
+    console.log("Connection test successful:", response);
+    this.message = "Connection successful! Configuration stored.";
+    this.isError = false;
+     this.isLoading = false;
+    this.router.navigate(['/SCENARIOS']); // Navigate to /SCENARIOS on success
+     },
+    error: (err) => {
+    console.error("Connection test failed:", err);
+    this.message = "Connection failed: " + (err.error?.message || err.message || "Unknown error");
+    this.isError = true;
+    this.isLoading = false;
+    },
+    });
     } else {
-      this.markFormGroupTouched(this.dbConfigForm)
+     this.markFormGroupTouched(this.dbConfigForm);
     }
-  }
+    }
 
   testProxyConnectionOnly() {
     const proxyHost = this.dbConfigForm.get("proxyHost")?.value

@@ -3,6 +3,8 @@ import type { Scenario } from "../../models/scenario.model"
 import { ScenarioService } from "../../services/scenario.service";
 import { ScenarioCardComponent } from "../scenario-card/scenario-card.component";
 import { CommonModule } from "@angular/common";
+import { FormsModule } from '@angular/forms';
+
 
 
 @Component({
@@ -11,7 +13,7 @@ import { CommonModule } from "@angular/common";
   templateUrl: "./dashboard.component.html",
   standalone: true, // ✅ Mark as standalone
 
-  imports: [CommonModule, ScenarioCardComponent],
+  imports: [CommonModule, ScenarioCardComponent,FormsModule],
   styleUrls: ["./dashboard.component.scss"],
 })
 export class DashboardComponent implements OnInit {
@@ -19,6 +21,8 @@ export class DashboardComponent implements OnInit {
   loading = true
   error = ""
   refreshing = false
+  searchTerm = ''
+
 
   constructor(private scenarioService: ScenarioService) {}
 
@@ -41,6 +45,15 @@ export class DashboardComponent implements OnInit {
         console.error("Error loading scenarios:", err)
       },
     })
+  }
+
+  get filteredScenarios(): Scenario[] {
+    if (!this.searchTerm) return this.scenarios
+    const term = this.searchTerm.toLowerCase()
+    return this.scenarios.filter(scenario => 
+      scenario.name.toLowerCase().includes(term) ||
+      (scenario.description?.toLowerCase().includes(term) ?? false)
+    )
   }
 
   refreshScenarios(): void {

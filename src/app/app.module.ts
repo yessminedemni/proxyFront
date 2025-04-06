@@ -10,10 +10,16 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ScenariosDashboardComponent } from './scenarios/scenarios-dashboard/scenarios-dashboard.component';
+import { DatabaseconfigComponent } from './databaseconfig/databaseconfig.component';
 
 // Routes
 const routes = [
-  { path: 'dashboard', component: DashboardComponent }
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'SCENARIOS', component: ScenariosDashboardComponent },
+  { path: 'databse-config', component: DatabaseconfigComponent },
+
+
+
 ];
 
 @NgModule({
@@ -27,7 +33,8 @@ const routes = [
     HeaderComponent,
     FooterComponent,
     DashboardComponent,
-    ScenariosDashboardComponent
+    ScenariosDashboardComponent,
+    RouterModule
   ],
   providers: [],
   bootstrap: [] // Must match your root component
