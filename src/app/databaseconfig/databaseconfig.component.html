@@ -5,6 +5,7 @@
       </div>
       <div class="card-body">
         <form [formGroup]="dbConfigForm" (ngSubmit)="onSubmit()">
+          <!-- Existing Database Configuration Section -->
           <div class="form-group mb-3">
             <label for="databaseType">Database Type</label>
             <select id="databaseType" formControlName="databaseType" class="form-control">
@@ -24,10 +25,14 @@
   
             <div class="form-group col-md-4 mb-3">
               <label for="port">Port</label>
-              <input type="text" id="port" formControlName="port" class="form-control"
+              <input type="number" id="port" formControlName="port" class="form-control"
                 [attr.disabled]="dbConfigForm.get('useCustomUrl')?.value ? true : null">
               <div *ngIf="dbConfigForm.get('port')?.invalid && dbConfigForm.get('port')?.touched" class="text-danger">
-                Port is required
+                <span *ngIf="dbConfigForm.get('port')?.errors?.['required']">Port is required</span>
+                <span *ngIf="dbConfigForm.get('port')?.errors?.['min'] || dbConfigForm.get('port')?.errors?.['max']">
+                  Port must be between 1 and 65535
+                </span>
+                <span *ngIf="dbConfigForm.get('port')?.errors?.['pattern']">Port must be a number</span>
               </div>
             </div>
   
@@ -75,6 +80,54 @@
   
           <input type="hidden" formControlName="generatedUrl">
   
+          <!-- New Proxy Configuration Section -->
+          <div class="card mt-4 mb-4">
+            <div class="card-header bg-info text-white">
+              <h3>MySQL Proxy Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-check mb-3">
+                <input type="checkbox" id="useProxy" formControlName="useProxy" class="form-check-input">
+                <label for="useProxy" class="form-check-label">Enable MySQL Proxy</label>
+              </div>
+  
+              <div *ngIf="dbConfigForm.get('useProxy')?.value">
+                <div class="row">
+                  <div class="form-group col-md-6 mb-3">
+                    <label for="proxyHost">Proxy Target Host</label>
+                    <input type="text" id="proxyHost" formControlName="proxyHost" class="form-control">
+                    <div *ngIf="dbConfigForm.get('proxyHost')?.invalid && dbConfigForm.get('proxyHost')?.touched" class="text-danger">
+                      Proxy Host is required when proxy is enabled
+                    </div>
+                  </div>
+  
+                  <div class="form-group col-md-6 mb-3">
+                    <label for="proxyPort">Proxy Target Port</label>
+                    <input type="number" id="proxyPort" formControlName="proxyPort" class="form-control">
+                    <div *ngIf="dbConfigForm.get('proxyPort')?.invalid && dbConfigForm.get('proxyPort')?.touched" class="text-danger">
+                      <span *ngIf="dbConfigForm.get('proxyPort')?.errors?.['required']">Proxy Port is required</span>
+                      <span *ngIf="dbConfigForm.get('proxyPort')?.errors?.['min'] || dbConfigForm.get('proxyPort')?.errors?.['max']">
+                        Port must be between 1 and 65535
+                      </span>
+                      <span *ngIf="dbConfigForm.get('proxyPort')?.errors?.['pattern']">Port must be a number</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="d-flex mt-2 mb-3">
+                  <button type="button" class="btn btn-info me-2" (click)="testProxyConnectionOnly()" [disabled]="isTestingConnection">
+                    <span *ngIf="isTestingConnection" class="spinner-border spinner-border-sm me-2"></span>
+                    Test Proxy Connection
+                  </button>
+                </div>
+                
+                <p class="text-muted">
+                  <small>The MySQL Proxy will forward connections from localhost:3301 to the target host and port specified above.</small>
+                </p>
+              </div>
+            </div>
+          </div>
+  
           <div *ngIf="message" class="alert mt-3" [ngClass]="{'alert-success': !isError, 'alert-danger': isError}">
             {{ message }}
           </div>
@@ -88,8 +141,14 @@
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
               Test Connection
             </button>
+            <button *ngIf="dbConfigForm.get('useProxy')?.value" type="button" class="btn btn-danger me-2 mb-2" (click)="stopProxy()" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              Stop Proxy
+            </button>
           </div>
         </form>
       </div>
     </div>
   </div>
+  
+  
