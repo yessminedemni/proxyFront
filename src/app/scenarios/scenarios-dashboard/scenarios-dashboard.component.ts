@@ -38,7 +38,7 @@ export class ScenariosDashboardComponent implements OnInit, AfterViewInit {
   scenarios: Scenario[] = []
   loading = true
   error = ""
-  refreshInterval = 5000 // 5 seconds
+  refreshInterval = 1000 // 5 seconds
   activeTab = "metrics" //
   searchTerm: string = '';
   

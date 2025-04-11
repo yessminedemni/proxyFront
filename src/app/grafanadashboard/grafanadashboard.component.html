@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>JVM Metrics Dashboard</h1>
+      <div class="refresh-indicator" [class.active]="loading">
+        <i class="fas fa-sync-alt refresh-icon"></i>
+        <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
+      </div>
+    </div>
+    
+    <div class="search-bar-wrapper">
+        <div class="search-bar">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Search App metrics"
+          />
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+      
+      
+    
+    <div class="metrics-overview">
+      <div
+        *ngIf="noMatchingMetricsFound()"
+        class="no-metrics"
+      >
+        <i class="fas fa-info-circle"></i>
+        <p>No metrics found for "{{ searchTerm }}"</p>
+      </div>
+      
+      <!-- CPU Usage -->
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[0].title)">
+        <div class="metric-header">
+          <h3>{{ metricCards[0].title }}</h3>
+          <div class="metric-info">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip">{{ metricCards[0].description }}</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #cpuChart></canvas>
+        </div>
+      </div>
+      
+      <!-- Heap Memory -->
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[1].title)">
+        <div class="metric-header">
+          <h3>{{ metricCards[1].title }}</h3>
+          <div class="metric-info">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip">{{ metricCards[1].description }}</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #heapMemoryChart></canvas>
+        </div>
+      </div>
+      
+      <!-- Non-Heap Memory -->
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[2].title)">
+        <div class="metric-header">
+          <h3>{{ metricCards[2].title }}</h3>
+          <div class="metric-info">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip">{{ metricCards[2].description }}</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #nonHeapMemoryChart></canvas>
+        </div>
+      </div>
+      
+      <!-- Thread Count -->
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[3].title)">
+        <div class="metric-header">
+          <h3>{{ metricCards[3].title }}</h3>
+          <div class="metric-info">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip">{{ metricCards[3].description }}</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #threadChart></canvas>
+        </div>
+      </div>
+      
+      <!-- GC Collection -->
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[4].title)">
+        <div class="metric-header">
+          <h3>{{ metricCards[4].title }}</h3>
+          <div class="metric-info">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip">{{ metricCards[4].description }}</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #gcCollectionChart></canvas>
+        </div>
+      </div>
+      
+      <!-- Loaded Classes -->
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[5].title)">
+        <div class="metric-header">
+          <h3>{{ metricCards[5].title }}</h3>
+          <div class="metric-info">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip">{{ metricCards[5].description }}</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #classesChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,45 @@
+<div class="documentation-container">
+    <h1>Application Documentation</h1>
+  
+    <section>
+      <h2>Overview</h2>
+      <p>
+        The MySQL Proxy Chaos Dashboard is a web application designed to test the performance and resilience of database systems under chaos scenarios like latency injection, packet loss, and stress testing.
+      </p>
+    </section>
+  
+    <section>
+      <h2>Proxy Behavior</h2>
+      <p>
+        The proxy sits between your application and the MySQL server, allowing the injection of custom behaviors based on the query type, such as delays or packet manipulation.
+      </p>
+    </section>
+  
+    <section>
+      <h2>Scenarios</h2>
+  
+      <h3>1. Latency Injection</h3>
+        Latency is injected dynamically based on query type:
+        <ul>
+          <li><strong>SELECT</strong> queries: 100-300ms</li>
+          <li><strong>INSERT</strong> queries: 200-500ms</li>
+          <li><strong>UPDATE</strong> queries: 250-600ms</li>
+          <li><strong>DELETE</strong> queries: 150-400ms</li>
+        </ul>
+  
+      <h3>2. Stress Testing</h3>
+      <p>
+        The stress testing spawns multiple threads to simulate heavy load:
+        <ul>
+          <li>Read operations: 100 concurrent threads</li>
+          <li>Write operations: 50 concurrent threads</li>
+          <li>Complex operations (JOINs, aggregations): 30 concurrent threads</li>
+        </ul>
+  
+      <h3>3. Packet Loss Simulation</h3>
+      <p>
+        During stress testing, simulated packet loss affects connection stability. The loss rate can be configured up to 20% depending on the load scenario.
+      </p>
+    </section>
+  </div>
+  
