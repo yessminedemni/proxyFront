@@ -1,25 +1,249 @@
-import { Component, type OnInit } from "@angular/core"
-import {  FormBuilder, type FormGroup, ReactiveFormsModule, Validators } from "@angular/forms"
-import { CommonModule } from "@angular/common"
-import { HttpClientModule } from "@angular/common/http"
-import { DatabaseConfigService } from "../services/database-config.service"
-import { MySQLProxyService } from "../services/MySQLProxyService .service"
-import { Router } from "@angular/router"; // Import the Router
-
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+import { HttpClientModule } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
+import { DatabaseConfigService } from "../services/database-config.service";
+import { MySQLProxyService } from "../services/MySQLProxyService .service";
+import { AppConfigService } from "../services/AppConfigService .service";
 
 @Component({
   selector: "app-databaseconfig",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, ReactiveFormsModule],
   templateUrl: "./databaseconfig.component.html",
   styleUrls: ["./databaseconfig.component.scss"],
 })
 export class DatabaseconfigComponent implements OnInit {
-  dbConfigForm!: FormGroup
-  isLoading = false
-  message = ""
-  isError = false
-  isTestingConnection = false
+[x: string]: any;
+  dbConfigForm!: FormGroup;
+  appConfigForm!: FormGroup;
+  isLoading = false;
+  isError = false;
+  message = "";
+  appMessage = "";
+  isAppError = false;
+  isAppLoading = false;
+  isTestingConnection = false;
+  isAppTestingConnection = false;
+  activeConfigType: 'database' | 'application' = 'database';
+
+
+  appTypes = [
+    { name: "REST API" },
+    { name: "WebApp" },
+    { name: "Node.js App" },
+    { name: "Microservice" },
+  ];
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private databaseConfigService: DatabaseConfigService,
+    private proxyService: MySQLProxyService,
+    private appConfigService: AppConfigService
+  ) {}
+
+  ngOnInit(): void {
+    this.initDbForm();
+    this.initAppForm();
+    this.loadProxyConfig();
+  }
+
+  setActiveConfigType(type: 'database' | 'application') {
+    this.activeConfigType = type;
+  }
+
+  initDbForm() {
+    this.dbConfigForm = this.fb.group({
+      databaseType: ["mysql", Validators.required],
+      host: ["localhost", Validators.required],
+      port: ["3306", [Validators.required, Validators.min(1), Validators.max(65535), Validators.pattern("^[0-9]+$")]],
+      databaseName: ["", Validators.required],
+      useCustomUrl: [false],
+      customUrl: [""],
+      username: ["", Validators.required],
+      password: ["", Validators.required],
+      generatedUrl: [""],
+      useProxy: [false],
+      proxyHost: ["localhost", Validators.required],
+      proxyPort: ["3306", [Validators.required, Validators.min(1), Validators.max(65535)]],
+    });
+
+    this.dbConfigForm.get("useCustomUrl")?.valueChanges.subscribe((useCustom) => {
+      const customUrl = this.dbConfigForm.get("customUrl");
+      const host = this.dbConfigForm.get("host");
+      const port = this.dbConfigForm.get("port");
+      const dbName = this.dbConfigForm.get("databaseName");
+
+      if (useCustom) {
+        customUrl?.setValidators([Validators.required]);
+        host?.clearValidators();
+        port?.clearValidators();
+        dbName?.clearValidators();
+      } else {
+        customUrl?.clearValidators();
+        host?.setValidators([Validators.required]);
+        port?.setValidators([Validators.required, Validators.min(1), Validators.max(65535)]);
+        dbName?.setValidators([Validators.required]);
+      }
+
+      customUrl?.updateValueAndValidity();
+      host?.updateValueAndValidity();
+      port?.updateValueAndValidity();
+      dbName?.updateValueAndValidity();
+    });
+
+    this.dbConfigForm.valueChanges.subscribe((val) => {
+      if (!val.useCustomUrl) {
+        const url = `jdbc:${val.databaseType}://${val.host}:${val.port}/${val.databaseName}`;
+        this.dbConfigForm.get("generatedUrl")?.setValue(url, { emitEvent: false });
+      }
+    });
+  }
+
+  initAppForm() {
+    this.appConfigForm = this.fb.group({
+      applicationType: ["REST API", Validators.required],
+      appHost: ["localhost", Validators.required],
+      appPort: ["8080", [Validators.required, Validators.min(1), Validators.max(65535)]],
+      appName: ["", Validators.required],
+      useCustomEndpoint: [false],
+      customEndpoint: [""],
+      appUsername: ["", Validators.required],
+      appPassword: ["", Validators.required],
+      generatedEndpoint: [""],
+      useAppProxy: [false],
+      appProxyHost: ["localhost", Validators.required],
+      appProxyPort: ["8080", [Validators.required, Validators.min(1), Validators.max(65535)]],
+    });
+
+    this.appConfigForm.valueChanges.subscribe((val) => {
+      if (!val.useCustomEndpoint) {
+        const url = `http://${val.appHost}:${val.appPort}/api`;
+        this.appConfigForm.get("generatedEndpoint")?.setValue(url, { emitEvent: false });
+      }
+    });
+  }
+  onAppSubmit() {
+    if (this.appConfigForm.valid) {
+      this.isAppLoading = true;
+      const payload = this.buildAppPayload();
+
+      this.appConfigService.saveAppConfig(payload).subscribe({
+        next: () => {
+          this.appMessage = "Application config saved!";
+          this.isAppError = false;
+          if (payload.useAppProxy) {
+            this.testAppProxyConnection();
+          } else {
+            this.isAppLoading = false;
+          }
+        },
+        error: (err) => {
+          this.appMessage = "Failed to save application config: " + err.message;
+          this.isAppError = true;
+          this.isAppLoading = false;
+        }
+      });
+    }
+  }
+
+  buildDbPayload() {
+    const val = this.dbConfigForm.value;
+    return {
+      databaseType: val.databaseType,
+      host: val.host,
+      port: val.port,
+      databaseName: val.databaseName,
+      useCustomUrl: val.useCustomUrl,
+      customUrl: val.customUrl,
+      username: val.username,
+      password: val.password,
+      jdbcUrl: val.useCustomUrl ? val.customUrl : val.generatedUrl,
+      useProxy: val.useProxy,
+      proxyHost: val.proxyHost,
+      proxyPort: val.proxyPort,
+    };
+  }
+
+  buildAppPayload() {
+    const val = this.appConfigForm.value;
+    return {
+      applicationType: val.applicationType,
+      host: val.appHost,
+      port: val.appPort,
+      appName: val.appName,
+      username: val.appUsername,
+      password: val.appPassword,
+      endpoint: val.useCustomEndpoint ? val.customEndpoint : val.generatedEndpoint,
+      useAppProxy: val.useAppProxy,
+      proxyHost: val.appProxyHost,
+      proxyPort: val.appProxyPort,
+    };
+  }
+
+  testAppConnection() {
+    if (this.appConfigForm.valid) {
+      const payload = this.buildAppPayload();
+      this.isAppLoading = true;
+
+      this.appConfigService.testAppConnection(payload).subscribe({
+        next: () => {
+          this.appMessage = "App connection successful!";
+          this.isAppError = false;
+          this.isAppLoading = false;
+        },
+        error: (err) => {
+          this.appMessage = "App connection failed: " + err.message;
+          this.isAppError = true;
+          this.isAppLoading = false;
+        }
+      });
+    }
+  }
+
+  testAppProxyConnection() {
+    const val = this.appConfigForm.value;
+    const config = { targetHost: val.appProxyHost, targetPort: val.appProxyPort, proxyPort: 8081 };
+
+    this.isAppTestingConnection = true;
+    this.appConfigService.testAppProxyConnection(config).subscribe({
+      next: () => {
+        this.appMessage = "Proxy test successful!";
+        this.isAppError = false;
+        this.isAppTestingConnection = false;
+      },
+      error: (err) => {
+        this.appMessage = "Proxy test failed: " + err.message;
+        this.isAppError = true;
+        this.isAppTestingConnection = false;
+      }
+    });
+  }
+
+  stopAppProxy() {
+    this.appConfigService.stopAppProxy().subscribe({
+      next: () => {
+        this.appMessage = "App Proxy stopped.";
+        this.appConfigForm.patchValue({ useAppProxy: false });
+      },
+      error: (err) => {
+        this.appMessage = "Failed to stop proxy: " + err.message;
+        this.isAppError = true;
+      }
+    });
+  }
+
+
+
+
+
+
+
+
 
   dbTypes = [
     { name: "mysql", port: 3306 },
@@ -36,98 +260,8 @@ export class DatabaseconfigComponent implements OnInit {
     { name: "dynamodb", port: 8000 },
   ]
 
-  constructor(
-    private fb: FormBuilder,
-    private databaseConfigService: DatabaseConfigService,
-    private proxyService: MySQLProxyService,
-     private router: Router // Inject the Router
-
-  ) {}
  
 
-  ngOnInit(): void {
-    this.dbConfigForm = this.fb.group({
-      databaseType: ["mysql", Validators.required],
-      host: ["localhost", Validators.required],
-      port: ["3306", [Validators.required, Validators.min(1), Validators.max(65535), Validators.pattern("^[0-9]+$")]],
-      databaseName: ["", Validators.required],
-      useCustomUrl: [false],
-      customUrl: [""],
-      username: ["", Validators.required],
-      password: ["", Validators.required],
-      generatedUrl: [""],
-      useProxy: [false],
-      proxyHost: ["localhost", [Validators.required]],
-      proxyPort: [
-        "3306",
-        [Validators.required, Validators.min(1), Validators.max(65535), Validators.pattern("^[0-9]+$")],
-      ],
-    })
-
-    this.dbConfigForm.get("useCustomUrl")?.valueChanges.subscribe((useCustom) => {
-      const customUrlControl = this.dbConfigForm.get("customUrl")
-      const hostControl = this.dbConfigForm.get("host")
-      const portControl = this.dbConfigForm.get("port")
-      const dbNameControl = this.dbConfigForm.get("databaseName")
-
-      if (useCustom) {
-        customUrlControl?.setValidators([Validators.required])
-        hostControl?.clearValidators()
-        portControl?.clearValidators()
-        dbNameControl?.clearValidators()
-      } else {
-        customUrlControl?.clearValidators()
-        hostControl?.setValidators([Validators.required])
-        portControl?.setValidators([
-          Validators.required,
-          Validators.min(1),
-          Validators.max(65535),
-          Validators.pattern("^[0-9]+$"),
-        ])
-        dbNameControl?.setValidators([Validators.required])
-      }
-
-      customUrlControl?.updateValueAndValidity()
-      hostControl?.updateValueAndValidity()
-      portControl?.updateValueAndValidity()
-      dbNameControl?.updateValueAndValidity()
-    })
-
-    this.dbConfigForm.get("useProxy")?.valueChanges.subscribe((useProxy) => {
-      const proxyHostControl = this.dbConfigForm.get("proxyHost")
-      const proxyPortControl = this.dbConfigForm.get("proxyPort")
-
-      if (useProxy) {
-        proxyHostControl?.setValidators([Validators.required])
-        proxyPortControl?.setValidators([
-          Validators.required,
-          Validators.min(1),
-          Validators.max(65535),
-          Validators.pattern("^[0-9]+$"),
-        ])
-        proxyHostControl?.enable()
-        proxyPortControl?.enable()
-      } else {
-        proxyHostControl?.clearValidators()
-        proxyPortControl?.clearValidators()
-        proxyHostControl?.disable()
-        proxyPortControl?.disable()
-      }
-
-      proxyHostControl?.updateValueAndValidity()
-      proxyPortControl?.updateValueAndValidity()
-    })
-
-    this.dbConfigForm.valueChanges.subscribe((val) => {
-      if (!val.useCustomUrl) {
-        const url = `jdbc:${val.databaseType}://${val.host}:${val.port}/${val.databaseName}`
-        this.dbConfigForm.get("generatedUrl")?.setValue(url, { emitEvent: false })
-      }
-    })
-
-    // Load current proxy config
-    this.loadProxyConfig()
-  }
 
   loadProxyConfig() {
     this.proxyService.getProxyConfig().subscribe({
@@ -395,3 +529,5 @@ export class DatabaseconfigComponent implements OnInit {
     })
   }
 }
+  
+

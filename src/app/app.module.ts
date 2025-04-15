@@ -14,7 +14,7 @@ import { DatabaseconfigComponent } from './databaseconfig/databaseconfig.compone
 import { DocumentationComponent } from './components/documentation/documentation.component';
 import { AppRoutingModule } from './app-routing.module';
 import { GrafanadashboardComponent } from './grafanadashboard/grafanadashboard.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Routes
 const routes = [
@@ -22,7 +22,8 @@ const routes = [
   { path: 'SCENARIOS', component: ScenariosDashboardComponent },
   { path: 'databse-config', component: DatabaseconfigComponent },
   { path: 'documentation', component: DocumentationComponent },
-  { path: 'grafana', component: GrafanadashboardComponent },
+  { path: 'metrics', component: GrafanadashboardComponent },
+  
 
   
 
@@ -43,6 +44,7 @@ const routes = [
     HeaderComponent,
     FooterComponent,
     DashboardComponent,
+    ReactiveFormsModule ,
     ScenariosDashboardComponent,
     RouterModule,
     AppRoutingModule,

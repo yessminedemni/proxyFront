@@ -5,10 +5,12 @@ import { tap, catchError } from "rxjs/operators"
 import { throwError } from "rxjs"
 
 export interface MySQLProxyConfig {
+  targetHost: any
   id?: number
   host: string
   port: number
 }
+
 
 @Injectable({
   providedIn: "root",

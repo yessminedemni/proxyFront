@@ -12,7 +12,7 @@ export const routes: Routes = [
   { path: 'databse-config', component: DatabaseconfigComponent },
   { path: '', redirectTo: '/databse-config', pathMatch: 'full' },
   { path: 'documentation', component: DocumentationComponent },
-    { path: 'grafana', component: GrafanadashboardComponent },
+    { path: 'metrics', component: GrafanadashboardComponent },
   
 
 ];
