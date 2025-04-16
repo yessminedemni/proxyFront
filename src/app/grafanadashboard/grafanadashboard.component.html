@@ -6,7 +6,9 @@
         <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
       </div>
     </div>
-    
+    <a [routerLink]="['/dashboard']" class="floating-alien-link">
+      <i class="fas fa-rocket"></i> Dashboard
+    </a>
     <div class="search-bar-wrapper">
         <div class="search-bar">
           <input

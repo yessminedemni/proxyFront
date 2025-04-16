@@ -1,11 +1,18 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1>Scenarios Dashboard</h1>
+    <a [routerLink]="['/SCENARIOS']" class="floating-alien-link">
+      <i class="fas fa-rocket"></i> Scenarios
+    </a>
+    <a [routerLink]="['/metrics']" class="floating-alien-link">
+      <i class="fas fa-chart-line"></i> JVMMetrics
+    </a>
     <div class="refresh-indicator" [class.active]="loading">
       <i class="fas fa-sync-alt refresh-icon"></i>
       <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
     </div>
   </div>
+  
 
   <div class="search-bar-wrapper">
     <div class="search-bar">

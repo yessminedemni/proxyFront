@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { PrometheusService } from '../services/PrometheusService .service';
+import { RouterModule } from '@angular/router';
 
 interface MetricCard {
   id: string;
@@ -35,7 +36,7 @@ interface MetricCard {
   templateUrl: './grafanadashboard.component.html',
   styleUrls: ['./grafanadashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule]
+  imports: [CommonModule, HttpClientModule, FormsModule,RouterModule]
 })
 export class GrafanadashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('cpuChart') cpuChartRef!: ElementRef;

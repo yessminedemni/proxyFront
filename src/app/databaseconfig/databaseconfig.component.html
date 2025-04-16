@@ -166,6 +166,23 @@
         </div>
       </form>
     </div>
+    <div class="connection-status-indicator" [ngClass]="connectionStatus">
+      <div class="status-icon"></div>
+      <div class="status-text">
+        <span *ngIf="connectionStatus === 'idle'">Not Connected</span>
+        <span *ngIf="connectionStatus === 'connecting'">Connecting...</span>
+        <span *ngIf="connectionStatus === 'connected'">Connected</span>
+        <span *ngIf="connectionStatus === 'failed'">Connection Failed</span>
+      </div>
+    </div>
+    
+    <!-- Add this to show proxy information when connected -->
+    <div *ngIf="connectionStatus === 'connected' && appConfigForm.value.useAppProxy" class="proxy-info">
+      <h4>Proxy Information</h4>
+      <p>Your application is accessible through the proxy at:</p>
+      <code>http://localhost:3303{{appConfigForm.value.apiPath ? '/' + appConfigForm.value.apiPath : ''}}</code>
+      <p>Original application: {{appConfigForm.value.appHost}}:{{appConfigForm.value.appPort}}</p>
+    </div>
   </div>
 
   <!-- Database Configuration Card -->
@@ -318,5 +335,24 @@
         </div>
       </form>
     </div>
+    <div class="connection-status-indicator" [ngClass]="connectionStatus">
+      <div class="status-icon"></div>
+      <div class="status-text">
+        <span *ngIf="connectionStatus === 'idle'">Not Connected</span>
+        <span *ngIf="connectionStatus === 'connecting'">Connecting...</span>
+        <span *ngIf="connectionStatus === 'connected'">Connected</span>
+        <span *ngIf="connectionStatus === 'failed'">Connection Failed</span>
+      </div>
+    </div>
+    
+    <!-- Add this to show proxy information when connected -->
+    <div *ngIf="connectionStatus === 'connected' && dbConfigForm.value.useProxy" class="proxy-info">
+      <h4>Proxy Information</h4>
+      <p>Your application is accessible through the proxy at:</p>
+      <code>http://localhost:3301{{dbConfigForm.value.apiPath ? '/' + dbConfigForm.value.apiPath : ''}}</code>
+      <p>Original database: {{dbConfigForm.value.appHost}}:{{dbConfigForm.value.port}}</p>
+    </div>
   </div>
-</div>
+  
+  </div>
+  

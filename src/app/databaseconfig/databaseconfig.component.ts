@@ -1,13 +1,11 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
-import { CommonModule } from "@angular/common";
-import { HttpClientModule } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { Observable, throwError } from "rxjs";
-import { catchError } from "rxjs/operators";
-import { DatabaseConfigService } from "../services/database-config.service";
-import { MySQLProxyService } from "../services/MySQLProxyService .service";
-import { AppConfigService } from "../services/AppConfigService .service";
+import { Component, type OnInit } from "@angular/core"
+import {  FormBuilder,  FormGroup, Validators, ReactiveFormsModule } from "@angular/forms"
+import { CommonModule } from "@angular/common"
+import { HttpClientModule } from "@angular/common/http"
+import  { Router } from "@angular/router"
+import  { DatabaseConfigService } from "../services/database-config.service"
+import  { MySQLProxyService } from "../services/MySQLProxyService .service"
+import  { AppConfigService } from "../services/AppConfigService .service"
 
 @Component({
   selector: "app-databaseconfig",
@@ -17,43 +15,41 @@ import { AppConfigService } from "../services/AppConfigService .service";
   styleUrls: ["./databaseconfig.component.scss"],
 })
 export class DatabaseconfigComponent implements OnInit {
-[x: string]: any;
-  dbConfigForm!: FormGroup;
-  appConfigForm!: FormGroup;
-  isLoading = false;
-  isError = false;
-  message = "";
-  appMessage = "";
-  isAppError = false;
-  isAppLoading = false;
-  isTestingConnection = false;
-  isAppTestingConnection = false;
-  activeConfigType: 'database' | 'application' = 'database';
+  [x: string]: any
+  dbConfigForm!: FormGroup
+  appConfigForm!: FormGroup
+  isLoading = false
+  isError = false
+  message = ""
+  appMessage = ""
+  isAppError = false
+  isAppLoading = false
+  isTestingConnection = false
+  isAppTestingConnection = false
+  activeConfigType: "database" | "application" = "database"
+  connectionStatus: "idle" | "connecting" | "connected" | "failed" = "idle"
 
-
-  appTypes = [
-    { name: "REST API" },
-    { name: "WebApp" },
-    { name: "Node.js App" },
-    { name: "Microservice" },
-  ];
+  appTypes = [{ name: "REST API" }, { name: "WebApp" }, { name: "Node.js App" }, { name: "Microservice" }]
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private databaseConfigService: DatabaseConfigService,
     private proxyService: MySQLProxyService,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
   ) {}
 
   ngOnInit(): void {
-    this.initDbForm();
-    this.initAppForm();
-    this.loadProxyConfig();
+    this.initDbForm()
+    this.initAppForm()
+    this.loadProxyConfig()
+
+    // Initialize connection status
+    this.connectionStatus = "idle"
   }
 
-  setActiveConfigType(type: 'database' | 'application') {
-    this.activeConfigType = type;
+  setActiveConfigType(type: "database" | "application") {
+    this.activeConfigType = type
   }
 
   initDbForm() {
@@ -70,40 +66,39 @@ export class DatabaseconfigComponent implements OnInit {
       useProxy: [false],
       proxyHost: ["localhost", Validators.required],
       proxyPort: ["3306", [Validators.required, Validators.min(1), Validators.max(65535)]],
-    });
+    })
 
     this.dbConfigForm.get("useCustomUrl")?.valueChanges.subscribe((useCustom) => {
-      const customUrl = this.dbConfigForm.get("customUrl");
-      const host = this.dbConfigForm.get("host");
-      const port = this.dbConfigForm.get("port");
-      const dbName = this.dbConfigForm.get("databaseName");
+      const customUrl = this.dbConfigForm.get("customUrl")
+      const host = this.dbConfigForm.get("host")
+      const port = this.dbConfigForm.get("port")
+      const dbName = this.dbConfigForm.get("databaseName")
 
       if (useCustom) {
-        customUrl?.setValidators([Validators.required]);
-        host?.clearValidators();
-        port?.clearValidators();
-        dbName?.clearValidators();
+        customUrl?.setValidators([Validators.required])
+        host?.clearValidators()
+        port?.clearValidators()
+        dbName?.clearValidators()
       } else {
-        customUrl?.clearValidators();
-        host?.setValidators([Validators.required]);
-        port?.setValidators([Validators.required, Validators.min(1), Validators.max(65535)]);
-        dbName?.setValidators([Validators.required]);
+        customUrl?.clearValidators()
+        host?.setValidators([Validators.required])
+        port?.setValidators([Validators.required, Validators.min(1), Validators.max(65535)])
+        dbName?.setValidators([Validators.required])
       }
 
-      customUrl?.updateValueAndValidity();
-      host?.updateValueAndValidity();
-      port?.updateValueAndValidity();
-      dbName?.updateValueAndValidity();
-    });
+      customUrl?.updateValueAndValidity()
+      host?.updateValueAndValidity()
+      port?.updateValueAndValidity()
+      dbName?.updateValueAndValidity()
+    })
 
     this.dbConfigForm.valueChanges.subscribe((val) => {
       if (!val.useCustomUrl) {
-        const url = `jdbc:${val.databaseType}://${val.host}:${val.port}/${val.databaseName}`;
-        this.dbConfigForm.get("generatedUrl")?.setValue(url, { emitEvent: false });
+        const url = `jdbc:${val.databaseType}://${val.host}:${val.port}/${val.databaseName}`
+        this.dbConfigForm.get("generatedUrl")?.setValue(url, { emitEvent: false })
       }
-    });
+    })
   }
-
   initAppForm() {
     this.appConfigForm = this.fb.group({
       applicationType: ["REST API", Validators.required],
@@ -114,24 +109,35 @@ export class DatabaseconfigComponent implements OnInit {
       customEndpoint: [""],
       appUsername: ["", Validators.required],
       appPassword: ["", Validators.required],
+      apiPath: ["", Validators.required], // Added API path field
+      healthEndpoint: ["/actuator/health"], // Added health endpoint for connection testing
+      authType: ["None"], // Added authentication type
       generatedEndpoint: [""],
       useAppProxy: [false],
       appProxyHost: ["localhost", Validators.required],
-      appProxyPort: ["8080", [Validators.required, Validators.min(1), Validators.max(65535)]],
+      appProxyPort: ["3303", [Validators.required, Validators.min(1), Validators.max(65535)]], // Updated to 3303
     });
-
-    this.appConfigForm.valueChanges.subscribe((val) => {
+  
+    this.appConfigForm.valueChanges.subscribe((val: { useCustomEndpoint: any; appHost: any; appPort: any; apiPath: string }) => {
       if (!val.useCustomEndpoint) {
-        const url = `http://${val.appHost}:${val.appPort}/api`;
+        let url = `http://${val.appHost}:${val.appPort}`;
+        if (val.apiPath) {
+          if (!val.apiPath.startsWith("/")) {
+            url += "/";
+          }
+          url += val.apiPath;
+        }
         this.appConfigForm.get("generatedEndpoint")?.setValue(url, { emitEvent: false });
       }
     });
   }
+  
   onAppSubmit() {
     if (this.appConfigForm.valid) {
       this.isAppLoading = true;
+      this.connectionStatus = "connecting";
       const payload = this.buildAppPayload();
-
+  
       this.appConfigService.saveAppConfig(payload).subscribe({
         next: () => {
           this.appMessage = "Application config saved!";
@@ -140,19 +146,22 @@ export class DatabaseconfigComponent implements OnInit {
             this.testAppProxyConnection();
           } else {
             this.isAppLoading = false;
+            this.connectionStatus = "connected";
           }
         },
         error: (err) => {
           this.appMessage = "Failed to save application config: " + err.message;
           this.isAppError = true;
           this.isAppLoading = false;
-        }
+          this.connectionStatus = "failed";
+        },
       });
     }
   }
+  
 
   buildDbPayload() {
-    const val = this.dbConfigForm.value;
+    const val = this.dbConfigForm.value
     return {
       databaseType: val.databaseType,
       host: val.host,
@@ -166,11 +175,11 @@ export class DatabaseconfigComponent implements OnInit {
       useProxy: val.useProxy,
       proxyHost: val.proxyHost,
       proxyPort: val.proxyPort,
-    };
+    }
   }
 
   buildAppPayload() {
-    const val = this.appConfigForm.value;
+    const val = this.appConfigForm.value
     return {
       applicationType: val.applicationType,
       host: val.appHost,
@@ -182,68 +191,135 @@ export class DatabaseconfigComponent implements OnInit {
       useAppProxy: val.useAppProxy,
       proxyHost: val.appProxyHost,
       proxyPort: val.appProxyPort,
-    };
+    }
   }
 
   testAppConnection() {
     if (this.appConfigForm.valid) {
-      const payload = this.buildAppPayload();
-      this.isAppLoading = true;
+      const payload = this.buildAppPayload()
+      this.isAppLoading = true
+      this.connectionStatus = "connecting"
 
       this.appConfigService.testAppConnection(payload).subscribe({
-        next: () => {
-          this.appMessage = "App connection successful!";
-          this.isAppError = false;
-          this.isAppLoading = false;
+        next: (response) => {
+          console.log("App connection test successful:", response)
+          this.appMessage = "App connection successful!"
+          this.isAppError = false
+          this.isAppLoading = false
+          this.connectionStatus = "connected"
+
+          // Store connection info in localStorage for persistence
+          localStorage.setItem(
+            "lastSuccessfulConnection",
+            JSON.stringify({
+              host: payload.host,
+              port: payload.port,
+              appName: payload.appName,
+              timestamp: new Date().toISOString(),
+            }),
+          )
+
+          this.showConnectionNotification(true)
         },
         error: (err) => {
-          this.appMessage = "App connection failed: " + err.message;
-          this.isAppError = true;
-          this.isAppLoading = false;
-        }
-      });
+          console.error("App connection test failed:", err)
+          this.appMessage = "App connection failed: " + err.message
+          this.isAppError = true
+          this.isAppLoading = false
+          this.connectionStatus = "failed"
+
+          this.showConnectionNotification(false)
+        },
+      })
     }
   }
 
   testAppProxyConnection() {
-    const val = this.appConfigForm.value;
-    const config = { targetHost: val.appProxyHost, targetPort: val.appProxyPort, proxyPort: 8081 };
+    const val = this.appConfigForm.value
 
-    this.isAppTestingConnection = true;
+    // Fix: Use the application host and port as target, not the proxy host/port
+    const config = {
+      targetHost: val.appHost, // Target is the actual application
+      targetPort: val.appPort, // Application port (8080)
+      proxyPort: "3303", // Fixed proxy port for ApplicationProxy
+    }
+
+    console.log("Sending testAppProxyConnection request with config:", config)
+    this.isAppTestingConnection = true
+    this.connectionStatus = "connecting"
+
     this.appConfigService.testAppProxyConnection(config).subscribe({
-      next: () => {
-        this.appMessage = "Proxy test successful!";
-        this.isAppError = false;
-        this.isAppTestingConnection = false;
+      next: (response) => {
+        console.log("Proxy test successful:", response)
+        this.appMessage =
+          "Proxy test successful! Your application is now accessible through the proxy at localhost:3303"
+        this.isAppError = false
+        this.isAppTestingConnection = false
+        this.connectionStatus = "connected"
+
+        // Show success notification
+        this.showConnectionNotification(true)
       },
       error: (err) => {
-        this.appMessage = "Proxy test failed: " + err.message;
-        this.isAppError = true;
-        this.isAppTestingConnection = false;
-      }
-    });
+        console.error("Proxy test failed:", err)
+        this.appMessage = "Proxy test failed: " + err.message
+        this.isAppError = true
+        this.isAppTestingConnection = false
+        this.connectionStatus = "failed"
+
+        // Show failure notification
+        this.showConnectionNotification(false)
+      },
+    })
+  }
+
+  // Add notification method
+  showConnectionNotification(success: boolean) {
+    // Create a notification element
+    const notification = document.createElement("div")
+    notification.style.position = "fixed"
+    notification.style.top = "20px"
+    notification.style.right = "20px"
+    notification.style.padding = "15px 20px"
+    notification.style.borderRadius = "5px"
+    notification.style.zIndex = "9999"
+    notification.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)"
+    notification.style.transition = "all 0.3s ease"
+
+    if (success) {
+      notification.style.backgroundColor = "#4CAF50"
+      notification.style.color = "white"
+      notification.textContent = "Successfully connected to application!"
+    } else {
+      notification.style.backgroundColor = "#F44336"
+      notification.style.color = "white"
+      notification.textContent = "Failed to connect to application!"
+    }
+
+    document.body.appendChild(notification)
+
+    // Remove after 5 seconds
+    setTimeout(() => {
+      notification.style.opacity = "0"
+      setTimeout(() => {
+        document.body.removeChild(notification)
+      }, 300)
+    }, 5000)
   }
 
   stopAppProxy() {
     this.appConfigService.stopAppProxy().subscribe({
       next: () => {
-        this.appMessage = "App Proxy stopped.";
-        this.appConfigForm.patchValue({ useAppProxy: false });
+        this.appMessage = "App Proxy stopped."
+        this.appConfigForm.patchValue({ useAppProxy: false })
+        this.connectionStatus = "idle"
       },
       error: (err) => {
-        this.appMessage = "Failed to stop proxy: " + err.message;
-        this.isAppError = true;
-      }
-    });
+        this.appMessage = "Failed to stop proxy: " + err.message
+        this.isAppError = true
+      },
+    })
   }
-
-
-
-
-
-
-
-
 
   dbTypes = [
     { name: "mysql", port: 3306 },
@@ -259,9 +335,6 @@ export class DatabaseconfigComponent implements OnInit {
     { name: "elasticsearch", port: 9200 },
     { name: "dynamodb", port: 8000 },
   ]
-
- 
-
 
   loadProxyConfig() {
     this.proxyService.getProxyConfig().subscribe({
@@ -430,30 +503,30 @@ export class DatabaseconfigComponent implements OnInit {
 
   testConnection() {
     if (this.dbConfigForm.valid) {
-    this.isLoading = true;
-    const payload = this.buildPayload();
-    
-    console.log("Testing connection with:", payload);
-    
-    this.databaseConfigService.testConnection(payload).subscribe({
-    next: (response) => {
-    console.log("Connection test successful:", response);
-    this.message = "Connection successful! Configuration stored.";
-    this.isError = false;
-     this.isLoading = false;
-    this.router.navigate(['/SCENARIOS']); // Navigate to /SCENARIOS on success
-     },
-    error: (err) => {
-    console.error("Connection test failed:", err);
-    this.message = "Connection failed: " + (err.error?.message || err.message || "Unknown error");
-    this.isError = true;
-    this.isLoading = false;
-    },
-    });
+      this.isLoading = true
+      const payload = this.buildPayload()
+
+      console.log("Testing connection with:", payload)
+
+      this.databaseConfigService.testConnection(payload).subscribe({
+        next: (response) => {
+          console.log("Connection test successful:", response)
+          this.message = "Connection successful! Configuration stored."
+          this.isError = false
+          this.isLoading = false
+          this.router.navigate(["/SCENARIOS"]) // Navigate to /SCENARIOS on success
+        },
+        error: (err) => {
+          console.error("Connection test failed:", err)
+          this.message = "Connection failed: " + (err.error?.message || err.message || "Unknown error")
+          this.isError = true
+          this.isLoading = false
+        },
+      })
     } else {
-     this.markFormGroupTouched(this.dbConfigForm);
+      this.markFormGroupTouched(this.dbConfigForm)
     }
-    }
+  }
 
   testProxyConnectionOnly() {
     const proxyHost = this.dbConfigForm.get("proxyHost")?.value
@@ -529,5 +602,3 @@ export class DatabaseconfigComponent implements OnInit {
     })
   }
 }
-  
-

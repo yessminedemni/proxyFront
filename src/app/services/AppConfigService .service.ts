@@ -11,58 +11,54 @@ export class AppConfigService {
 
   constructor(private http: HttpClient) {}
 
-  // Database configuration methods
-  getDbConfig(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/db-config`).pipe(retry(1), catchError(this.handleError))
-  }
-
-  saveDbConfig(config: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/db-config`, config).pipe(catchError(this.handleError))
-  }
-
-  testDbConnection(config: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/test-db-connection`, config).pipe(catchError(this.handleError))
-  }
-
-  testDbProxyConnection(config: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/test-db-proxy`, config).pipe(catchError(this.handleError))
-  }
-
-  stopDbProxy(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/stop-db-proxy`, {}).pipe(catchError(this.handleError))
-  }
-
   // Application configuration methods
   getAppConfig(): Observable<any> {
     return this.http.get(`${this.apiUrl}/app-config`).pipe(retry(1), catchError(this.handleError))
   }
 
   saveAppConfig(config: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/app-config`, config).pipe(catchError(this.handleError))
+    // Ensure all values have the correct types before sending
+    const payload = {
+      ...config,
+      // Ensure port is sent as a string to match backend expectations
+      port: config.port ? config.port.toString() : null,
+      // Include other fields that might need type conversion
+    }
+
+    console.log("Sending app config:", payload)
+    return this.http.post(`${this.apiUrl}/app-config`, payload).pipe(catchError(this.handleError))
   }
 
   testAppConnection(config: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/test-app-connection`, config).pipe(catchError(this.handleError))
+    // Ensure all values have the correct types before sending
+    const payload = {
+      ...config,
+      // Ensure port is sent as a string to match backend expectations
+      port: config.port ? config.port.toString() : null,
+      // Include other fields that might need type conversion
+    }
+
+    console.log("Testing app connection with:", payload)
+    return this.http.post(`${this.apiUrl}/test-app-connection`, payload).pipe(catchError(this.handleError))
   }
 
   testAppProxyConnection(config: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/test-app-proxy`, config).pipe(catchError(this.handleError))
+    // Ensure all values have the correct types before sending
+    const payload = {
+      targetHost: config.targetHost,
+      targetPort: config.targetPort.toString(), // Convert to string as expected by backend
+      proxyPort: config.proxyPort.toString(), // Use the provided proxyPort value
+    }
+
+    console.log("Testing app proxy connection with:", payload)
+    return this.http.post(`${this.apiUrl}/test-app-proxy`, payload).pipe(catchError(this.handleError))
   }
 
   stopAppProxy(): Observable<any> {
     return this.http.post(`${this.apiUrl}/stop-app-proxy`, {}).pipe(catchError(this.handleError))
   }
 
-  // Chaos configuration methods
-  getScenarios(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/scenarios`).pipe(retry(1), catchError(this.handleError))
-  }
-
-  setScenario(scenarioName: string, enabled: boolean): Observable<any> {
-    return this.http.post(`${this.apiUrl}/set-scenario`, { scenarioName, enabled }).pipe(catchError(this.handleError))
-  }
-
-  // Error handling
+  // Enhanced error handling with more details
   private handleError(error: HttpErrorResponse) {
     let errorMessage = ""
     if (error.error instanceof ErrorEvent) {
@@ -71,8 +67,24 @@ export class AppConfigService {
     } else {
       // Server-side error
       errorMessage = `Server Error Code: ${error.status}\nMessage: ${error.message}`
+
+      // Add more details if available
+      if (error.error) {
+        if (typeof error.error === "string") {
+          errorMessage += `\nDetails: ${error.error}`
+        } else if (error.error.message) {
+          errorMessage += `\nDetails: ${error.error.message}`
+        }
+      }
     }
-    console.error(errorMessage)
+
+    console.error("API Error:", errorMessage, error)
     return throwError(() => new Error(errorMessage))
   }
+  updateScenarioState(name: string, enabled: boolean): Observable<any> {
+    const config = { name, enabled };
+    return this.http.post(`${this.apiUrl}/update-scenario`, config).pipe(catchError(this.handleError));
+  }
+  
+  
 }

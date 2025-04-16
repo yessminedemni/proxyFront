@@ -5,6 +5,7 @@ import Chart from "chart.js/auto"
 import {  HttpClient, HttpClientModule } from "@angular/common/http"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
+import { RouterModule } from "@angular/router"
 
 interface Scenario {
   name: string
@@ -27,7 +28,7 @@ interface ScenarioMetrics {
   selector: "app-scenarios-dashboard",
   templateUrl: "./scenarios-dashboard.component.html",
   styleUrls: ["./scenarios-dashboard.component.scss"],
-  imports: [CommonModule, HttpClientModule,FormsModule],
+  imports: [CommonModule, HttpClientModule,FormsModule,RouterModule],
   standalone: true,
 })
 export class ScenariosDashboardComponent implements OnInit, AfterViewInit {

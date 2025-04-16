@@ -4,6 +4,7 @@ import { ScenarioService } from "../../services/scenario.service";
 import { ScenarioCardComponent } from "../scenario-card/scenario-card.component";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from "@angular/router";
 
 
 
@@ -13,7 +14,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: "./dashboard.component.html",
   standalone: true, // ✅ Mark as standalone
 
-  imports: [CommonModule, ScenarioCardComponent,FormsModule],
+  imports: [CommonModule, ScenarioCardComponent,FormsModule,RouterModule  ],
   styleUrls: ["./dashboard.component.scss"],
 })
 export class DashboardComponent implements OnInit {
