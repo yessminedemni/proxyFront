@@ -1,0 +1,59 @@
+<div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>App Scenarios Dashboard</h1>
+      <a [routerLink]="['/app-scenarios']" class="floating-alien-link">
+        <i class="fas fa-rocket"></i> App Scenarios
+      </a>
+      <a [routerLink]="['/metrics']" class="floating-alien-link">
+        <i class="fas fa-chart-line"></i> JVMMetrics
+      </a>
+      <div class="refresh-indicator" [class.active]="loading">
+        <i class="fas fa-sync-alt refresh-icon"></i>
+        <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
+      </div>
+    </div>
+    
+    <div class="search-bar-wrapper">
+      <div class="search-bar">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search diagrams..."
+        />
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
+    
+    <div class="metrics-overview scenarios-container">
+      <div
+        *ngIf="!matchesSearch('CPU Load') && !matchesSearch('Traffic Load') && !matchesSearch('Response Time')"
+        class="no-scenarios"
+      >
+        <i class="fas fa-info-circle"></i>
+        <p>No diagrams found for "{{ searchTerm }}"</p>
+      </div>
+  
+      <div class="metric-card" *ngIf="matchesSearch('CPU Load')">
+        <h3>CPU Load</h3>
+        <div class="chart-container">
+          <canvas #cpuLoadChart></canvas>
+        </div>
+      </div>
+  
+      <div class="metric-card" *ngIf="matchesSearch('Traffic Load')">
+        <h3>Traffic Load</h3>
+        <div class="chart-container">
+          <canvas #trafficLoadChart></canvas>
+        </div>
+      </div>
+  
+      <div class="metric-card" *ngIf="matchesSearch('Response Time')">
+        <h3>Response Time</h3>
+        <div class="chart-container">
+          <canvas #responseTimeChart></canvas>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  

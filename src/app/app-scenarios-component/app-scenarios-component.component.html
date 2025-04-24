@@ -1,0 +1,108 @@
+<div class="chaos-dashboard">
+    <!-- Header Section -->
+    <header class="dashboard-header">
+      <h1>APP Scenario</h1>
+      <p>Manage and control Return 404 behavior</p>
+    </header>
+  
+    <!-- Controls Container -->
+    <div class="controls-container">
+      <!-- Action Buttons (Refresh) - Centered -->
+      <div class="action-buttons">
+        <button (click)="loadScenarios()" class="refresh-btn" [disabled]="isLoading">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </div>
+    </div>
+  
+    <!-- Search Bar - Moved below refresh button and centered -->
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search scenarios..."
+      />
+      <i class="fas fa-search"></i>
+    </div>
+  
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading scenario...</p>
+    </div>
+  
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error }}</p>
+      <button (click)="error = null" class="dismiss-btn">Dismiss</button>
+    </div>
+  
+    <!-- Scenarios Container -->
+    <div *ngIf="!isLoading && !error" class="scenarios-container">
+      <!-- Scenario Card -->
+      <div *ngFor="let scenario of filteredScenarios" class="scenario-card" [ngClass]="{'enabled': scenario.enabled}">
+        <div class="scenario-icon">
+          <i class="fas" [ngClass]="getScenarioIcon()"></i>
+        </div>
+        
+        <div class="scenario-content">
+          <div class="scenario-header">
+            <h3>{{ scenario.name }}</h3>
+            <div class="scenario-meta">
+              <span class="category">
+                <i class="fas" [ngClass]="getCategoryIcon()"></i>
+                {{ scenario.category }}
+              </span>
+              <span class="impact" [ngClass]="getImpactClass()">
+                {{ scenario.impact }}
+              </span>
+            </div>
+          </div>
+          
+          <p class="scenario-description">{{ scenario.description }}</p>
+          
+          <div class="scenario-details" *ngIf="scenario.details">
+            <div *ngFor="let detail of scenario.details | keyvalue" class="detail-item">
+              <span class="detail-label">{{ detail.key }}:</span>
+              <span class="detail-value">{{ detail.value }}</span>
+            </div>
+          </div>
+          
+          <div class="scenario-footer">
+            <div class="status-indicator" [ngClass]="{'enabled': scenario.enabled}">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ scenario.enabled ? 'Enabled' : 'Disabled' }}</span>
+            </div>
+            
+            <button
+              class="toggle-btn"
+              [ngClass]="{'enabled': scenario.enabled}"
+              (click)="toggleScenario(scenario)"
+              [disabled]="scenario.isToggling"
+            >
+              <i *ngIf="scenario.isToggling" class="fas fa-spinner fa-spin"></i>
+              <span *ngIf="!scenario.isToggling">{{ scenario.enabled ? 'Disable' : 'Enable' }}</span>
+              <span *ngIf="scenario.isToggling">{{ scenario.enabled ? 'Disabling...' : 'Enabling...' }}</span>
+            </button>
+          </div>
+          
+          <div *ngIf="scenario.error" class="error-message">
+            {{ scenario.error }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dashboard-info">
+        <div class="info-card">
+          <h3><i class="fas fa-info-circle"></i> About Chaos Testing</h3>
+          <p>Chaos testing is the process of deliberately introducing failures in a system to test its resilience and identify weaknesses.</p>
+        </div>
+    
+        <div class="info-card">
+          <h3><i class="fas fa-exclamation-triangle"></i> Warning</h3>
+          <p>These scenarios can impact your database performance. Use with caution in production environments.</p>
+        </div>
+      </div>
+</div>
+    

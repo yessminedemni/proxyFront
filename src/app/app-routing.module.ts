@@ -5,6 +5,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ScenariosDashboardComponent } from './scenarios/scenarios-dashboard/scenarios-dashboard.component';
 import { DocumentationComponent } from './components/documentation/documentation.component';
 import { GrafanadashboardComponent } from './grafanadashboard/grafanadashboard.component';
+import { AppScenariosComponent } from './app-scenarios-component/app-scenarios-component.component';
+import { AppScenariosDashboardComponentComponent } from './app-scenarios-dashboard-component/app-scenarios-dashboard-component.component';
 
 export const routes: Routes = [
   { path: 'dashboard', component: ScenariosDashboardComponent },
@@ -13,6 +15,11 @@ export const routes: Routes = [
   { path: '', redirectTo: '/databse-config', pathMatch: 'full' },
   { path: 'documentation', component: DocumentationComponent },
     { path: 'metrics', component: GrafanadashboardComponent },
+    { path: 'app-scenarios', component: AppScenariosComponent },
+    { path: 'app-dashboard', component: AppScenariosDashboardComponentComponent },
+
+
+
   
 
 ];

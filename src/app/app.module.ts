@@ -15,6 +15,8 @@ import { DocumentationComponent } from './components/documentation/documentation
 import { AppRoutingModule } from './app-routing.module';
 import { GrafanadashboardComponent } from './grafanadashboard/grafanadashboard.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AppScenariosComponent } from './app-scenarios-component/app-scenarios-component.component';
+import { AppScenariosDashboardComponentComponent } from './app-scenarios-dashboard-component/app-scenarios-dashboard-component.component';
 
 // Routes
 const routes = [
@@ -23,6 +25,11 @@ const routes = [
   { path: 'databse-config', component: DatabaseconfigComponent },
   { path: 'documentation', component: DocumentationComponent },
   { path: 'metrics', component: GrafanadashboardComponent },
+  { path: 'app-scenarios', component: AppScenariosComponent },
+  { path: 'app-dashboard', component: AppScenariosDashboardComponentComponent },
+
+  
+
   
 
   
@@ -48,9 +55,10 @@ const routes = [
     ScenariosDashboardComponent,
     RouterModule,
     AppRoutingModule,
+    AppScenariosComponent,
+    AppScenariosComponent,
     DocumentationComponent ,
-    GrafanadashboardComponent// ✅ must be here
-    // ✅ Use the routing module here
+    GrafanadashboardComponent,
 
   ],
   providers: [],
