@@ -78,6 +78,7 @@ export class ScenarioCardComponent {
         return "fa-cog"
     }
   }
+  
 
   getScenarioIcon(): string {
     switch (this.scenario.name) {

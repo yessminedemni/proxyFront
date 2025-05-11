@@ -29,12 +29,12 @@ export class ScenarioManagerService {
       if (scenarios.stress_testing) {
         this.dbStressService.startStressTest().subscribe(
           () => console.log('Stress test started due to scenario.'),
-          (error) => console.error('Error starting stress test:', error)
+          (error: any) => console.error('Error starting stress test:', error)
         );
       } else {
         this.dbStressService.stopStressTest().subscribe(
           () => console.log('Stress test stopped due to scenario.'),
-          (error) => console.error('Error stopping stress test:', error)
+          (error: any) => console.error('Error stopping stress test:', error)
         );
       }
     });

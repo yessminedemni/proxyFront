@@ -1,43 +1,98 @@
 <div class="dashboard-container">
-    <div class="dashboard-header">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading && (generatingPdf || true)">
+    <div class="loading-message">
+      <div class="loading-icon">
+        <i class="fas fa-spinner fa-pulse"></i>
+      </div>
+      <h3 class="loading-title">{{ generatingPdf ? 'Generating PDF Report' : 'Refreshing Metrics' }}</h3>
+      <p class="loading-description">{{ generatingPdf ? 'This may take a few moments as we prepare comprehensive analysis for each JVM metric.' : 'Please wait while we fetch the latest data...' }}</p>
+    </div>
+  </div>
+
+  <header class="dashboard-header">
+    <div class="header-title">
       <h1>JVM Metrics Dashboard</h1>
       <div class="refresh-indicator" [class.active]="loading">
-        <i class="fas fa-sync-alt refresh-icon"></i>
+        <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
         <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
       </div>
     </div>
-    <a [routerLink]="['/dashboard']" class="floating-alien-link">
-      <i class="fas fa-rocket"></i> Dashboard
-    </a>
-    <div class="search-bar-wrapper">
-        <div class="search-bar">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            placeholder="Search App metrics"
-          />
-          <i class="fas fa-search"></i>
-        </div>
-      </div>
-      
-      
     
-    <div class="metrics-overview">
-      <div
-        *ngIf="noMatchingMetricsFound()"
-        class="no-metrics"
-      >
-        <i class="fas fa-info-circle"></i>
-        <p>No metrics found for "{{ searchTerm }}"</p>
-      </div>
+    <div class="dashboard-actions">
+      <button 
+        (click)="exportPDF()" 
+        class="btn btn-primary export-button" 
+        [disabled]="loading"
+        aria-label="Export as PDF">
+        <i class="fas fa-file-pdf" aria-hidden="true"></i> 
+        <span>Export as PDF</span>
+      </button>
       
+      <button 
+        (click)="refreshData()" 
+        class="btn btn-success refresh-button" 
+        [disabled]="loading"
+        aria-label="Refresh data">
+        <i class="fas fa-sync-alt" aria-hidden="true"></i> 
+        <span>Refresh</span>
+      </button>
+    </div>
+  </header>
+  
+  <div class="navigation-section">
+    <a [routerLink]="['/dashboard']" class="nav-link">
+      <i class="fas fa-rocket" aria-hidden="true"></i> 
+      <span>Dashboard</span>
+    </a>
+  </div>
+  
+  <div class="search-section">
+    <div class="search-container">
+      <i class="fas fa-search search-icon" aria-hidden="true"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search JVM metrics"
+        aria-label="Search JVM metrics"
+        class="search-input"
+      />
+      <button 
+        *ngIf="searchTerm" 
+        (click)="searchTerm = ''" 
+        class="clear-search" 
+        aria-label="Clear search">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+  
+  <div class="metrics-dashboard">
+    <div
+      *ngIf="noMatchingMetricsFound()"
+      class="no-results"
+    >
+      <div class="no-results-icon">
+        <i class="fas fa-search" aria-hidden="true"></i>
+      </div>
+      <h3 class="no-results-title">No results found</h3>
+      <p class="no-results-message">No metrics found matching "{{ searchTerm }}"</p>
+      <button (click)="searchTerm = ''" class="btn btn-outline reset-search">Clear Search</button>
+    </div>
+
+    <div class="metrics-grid">
       <!-- CPU Usage -->
-      <div class="metric-card" *ngIf="matchesSearch(metricCards[0].title)">
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[0].title)" data-metric="cpu">
         <div class="metric-header">
-          <h3>{{ metricCards[0].title }}</h3>
-          <div class="metric-info">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">{{ metricCards[0].description }}</span>
+          <h3 class="metric-title">
+            <i class="fas fa-microchip metric-icon" aria-hidden="true"></i>
+            {{ metricCards[0].title }}
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-info" tabindex="0">
+              <i class="fas fa-info-circle" aria-hidden="true"></i>
+              <div class="tooltip">{{ metricCards[0].description }}</div>
+            </div>
           </div>
         </div>
         <div class="chart-container">
@@ -46,12 +101,17 @@
       </div>
       
       <!-- Heap Memory -->
-      <div class="metric-card" *ngIf="matchesSearch(metricCards[1].title)">
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[1].title)" data-metric="memory">
         <div class="metric-header">
-          <h3>{{ metricCards[1].title }}</h3>
-          <div class="metric-info">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">{{ metricCards[1].description }}</span>
+          <h3 class="metric-title">
+            <i class="fas fa-memory metric-icon" aria-hidden="true"></i>
+            {{ metricCards[1].title }}
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-info" tabindex="0">
+              <i class="fas fa-info-circle" aria-hidden="true"></i>
+              <div class="tooltip">{{ metricCards[1].description }}</div>
+            </div>
           </div>
         </div>
         <div class="chart-container">
@@ -60,12 +120,17 @@
       </div>
       
       <!-- Non-Heap Memory -->
-      <div class="metric-card" *ngIf="matchesSearch(metricCards[2].title)">
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[2].title)" data-metric="memory">
         <div class="metric-header">
-          <h3>{{ metricCards[2].title }}</h3>
-          <div class="metric-info">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">{{ metricCards[2].description }}</span>
+          <h3 class="metric-title">
+            <i class="fas fa-memory metric-icon" aria-hidden="true"></i>
+            {{ metricCards[2].title }}
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-info" tabindex="0">
+              <i class="fas fa-info-circle" aria-hidden="true"></i>
+              <div class="tooltip">{{ metricCards[2].description }}</div>
+            </div>
           </div>
         </div>
         <div class="chart-container">
@@ -74,12 +139,17 @@
       </div>
       
       <!-- Thread Count -->
-      <div class="metric-card" *ngIf="matchesSearch(metricCards[3].title)">
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[3].title)" data-metric="threads">
         <div class="metric-header">
-          <h3>{{ metricCards[3].title }}</h3>
-          <div class="metric-info">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">{{ metricCards[3].description }}</span>
+          <h3 class="metric-title">
+            <i class="fas fa-project-diagram metric-icon" aria-hidden="true"></i>
+            {{ metricCards[3].title }}
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-info" tabindex="0">
+              <i class="fas fa-info-circle" aria-hidden="true"></i>
+              <div class="tooltip">{{ metricCards[3].description }}</div>
+            </div>
           </div>
         </div>
         <div class="chart-container">
@@ -88,12 +158,17 @@
       </div>
       
       <!-- GC Collection -->
-      <div class="metric-card" *ngIf="matchesSearch(metricCards[4].title)">
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[4].title)" data-metric="gc">
         <div class="metric-header">
-          <h3>{{ metricCards[4].title }}</h3>
-          <div class="metric-info">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">{{ metricCards[4].description }}</span>
+          <h3 class="metric-title">
+            <i class="fas fa-recycle metric-icon" aria-hidden="true"></i>
+            {{ metricCards[4].title }}
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-info" tabindex="0">
+              <i class="fas fa-info-circle" aria-hidden="true"></i>
+              <div class="tooltip">{{ metricCards[4].description }}</div>
+            </div>
           </div>
         </div>
         <div class="chart-container">
@@ -102,12 +177,17 @@
       </div>
       
       <!-- Loaded Classes -->
-      <div class="metric-card" *ngIf="matchesSearch(metricCards[5].title)">
+      <div class="metric-card" *ngIf="matchesSearch(metricCards[5].title)" data-metric="classes">
         <div class="metric-header">
-          <h3>{{ metricCards[5].title }}</h3>
-          <div class="metric-info">
-            <i class="fas fa-info-circle"></i>
-            <span class="tooltip">{{ metricCards[5].description }}</span>
+          <h3 class="metric-title">
+            <i class="fas fa-cubes metric-icon" aria-hidden="true"></i>
+            {{ metricCards[5].title }}
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-info" tabindex="0">
+              <i class="fas fa-info-circle" aria-hidden="true"></i>
+              <div class="tooltip">{{ metricCards[5].description }}</div>
+            </div>
           </div>
         </div>
         <div class="chart-container">
@@ -116,3 +196,4 @@
       </div>
     </div>
   </div>
+</div>
