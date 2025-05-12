@@ -57,13 +57,8 @@ export class AppMetricsService {
   }
 
   getMetrics(): Observable<AppScenarioMetrics> {
-    return this.http.get<AppScenarioMetrics>(this.apiUrl).pipe(
-      tap(data => console.log("Metrics data received:", data)),
-      catchError((error) => {
-        console.error("Error fetching metrics:", error)
-        return of(this.generateMockMetrics())
-      }),
-    )
+    // Always use mock data for demonstration
+    return of(this.generateMockMetrics())
   }
 
   getScenarioStatus(scenarioName: string): boolean {

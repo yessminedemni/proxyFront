@@ -66,7 +66,7 @@
   
   <div class="metrics-dashboard">
     <div
-      *ngIf="!matchesSearch('Packet Loss') && !matchesSearch('Latency') && !matchesSearch('Query Load')"
+      *ngIf="!matchesSearch('Packet Loss') && !matchesSearch('Latency') && !matchesSearch('Query Load') && !matchesSearch('Query Blackhole') && !matchesSearch('Connection Kill') && !matchesSearch('Disk Fault')"
       class="no-results"
     >
       <div class="no-results-icon">
@@ -84,6 +84,9 @@
           <h3 class="metric-title">
             <i class="fas fa-exclamation-triangle metric-icon" aria-hidden="true"></i>
             Packet Loss
+            <span class="status-badge" [class.active]="getScenarioStatus('packet_loss') === 'Active'">
+              {{ getScenarioStatus('packet_loss') }}
+            </span>
           </h3>
           <div class="metric-actions">
             <div class="metric-badge">{{ getMetricValue('packetLoss') | number:'1.1-2' }}%</div>
@@ -100,6 +103,9 @@
           <h3 class="metric-title">
             <i class="fas fa-clock metric-icon" aria-hidden="true"></i>
             Latency
+            <span class="status-badge" [class.active]="getScenarioStatus('latency_injection') === 'Active'">
+              {{ getScenarioStatus('latency_injection') }}
+            </span>
           </h3>
           <div class="metric-actions">
             <div class="metric-badge">{{ getMetricValue('latency') | number:'1.0-0' }} ms</div>
@@ -116,6 +122,9 @@
           <h3 class="metric-title">
             <i class="fas fa-database metric-icon" aria-hidden="true"></i>
             Query Load
+            <span class="status-badge" [class.active]="getScenarioStatus('stress_testing') === 'Active'">
+              {{ getScenarioStatus('stress_testing') }}
+            </span>
           </h3>
           <div class="metric-actions">
             <div class="metric-badge">{{ getMetricValue('queryLoad') | number:'1.0-0' }} q/s</div>
@@ -123,6 +132,63 @@
         </div>
         <div class="chart-container">
           <canvas #queryLoadChart></canvas>
+        </div>
+      </div>
+
+      <!-- Query Blackhole -->
+      <div class="metric-card" *ngIf="matchesSearch('Query Blackhole')" data-metric="query-blackhole">
+        <div class="metric-header">
+          <h3 class="metric-title">
+            <i class="fas fa-ban metric-icon" aria-hidden="true"></i>
+            Query Blackhole
+            <span class="status-badge" [class.active]="getScenarioStatus('query_blackhole') === 'Active'">
+              {{ getScenarioStatus('query_blackhole') }}
+            </span>
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-badge">{{ getMetricValue('queryBlackhole') | number:'1.1-2' }}%</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #queryBlackholeChart></canvas>
+        </div>
+      </div>
+
+      <!-- Connection Kill -->
+      <div class="metric-card" *ngIf="matchesSearch('Connection Kill')" data-metric="connection-kill">
+        <div class="metric-header">
+          <h3 class="metric-title">
+            <i class="fas fa-plug metric-icon" aria-hidden="true"></i>
+            Connection Kill
+            <span class="status-badge" [class.active]="getScenarioStatus('connection_kill') === 'Active'">
+              {{ getScenarioStatus('connection_kill') }}
+            </span>
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-badge">{{ getMetricValue('connectionKill') | number:'1.1-2' }}%</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #connectionKillChart></canvas>
+        </div>
+      </div>
+
+      <!-- Disk Fault -->
+      <div class="metric-card" *ngIf="matchesSearch('Disk Fault')" data-metric="disk-fault">
+        <div class="metric-header">
+          <h3 class="metric-title">
+            <i class="fas fa-hdd metric-icon" aria-hidden="true"></i>
+            Disk Fault
+            <span class="status-badge" [class.active]="getScenarioStatus('disk_fault') === 'Active'">
+              {{ getScenarioStatus('disk_fault') }}
+            </span>
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-badge">{{ getMetricValue('diskFault') | number:'1.1-2' }}%</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #diskFaultChart></canvas>
         </div>
       </div>
     </div>

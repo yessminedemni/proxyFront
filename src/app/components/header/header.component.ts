@@ -1,14 +1,26 @@
-import { Component } from "@angular/core";
-import { ScenarioCardComponent } from "../scenario-card/scenario-card.component";
-import { RouterModule } from "@angular/router";
+import { Component } from '@angular/core';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  imports: [RouterModule], // 👈 This is what makes routerLink work
-
   styleUrls: ['./header.component.scss'],
+  imports: [RouterModule  ],
+
 })
 export class HeaderComponent {
-title: any;
+  title = 'Chaos Dashboard';
+  sidebarOpen = false;
+  
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
+  }
+
+
 }

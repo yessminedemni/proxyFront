@@ -630,3 +630,17 @@ $font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ox
     flex-direction: column;
   }
 }
+
+.status-badge {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  background-color: #e0e0e0;
+  color: #666;
+  
+  &.active {
+    background-color: #4caf50;
+    color: white;
+  }
+}

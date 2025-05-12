@@ -7,4 +7,10 @@ import type { Observable } from "rxjs";
   providedIn: "root",
 })
 export class DbStressService {
+  stopStressTest() {
+    throw new Error('Method not implemented.');
+  }
+  startStressTest() {
+    throw new Error('Method not implemented.');
+  }
 }

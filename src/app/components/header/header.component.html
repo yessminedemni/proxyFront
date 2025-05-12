@@ -1,27 +1,86 @@
 <header class="header">
   <div class="header-content">
-    <div class="logo">
-      <i class="fas fa-database"></i>
-      <span>{{ title }}</span>
+    <!-- Left: Menu Toggle -->
+    <button class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle Sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Center: Logo and Proxy Status -->
+    <div class="center-area">
+      <div class="logo">
+        <i class="fas fa-database"></i>
+        <span>{{ title }}</span>
+      </div>
+      <div class="status-indicator">
+        <span class="dot"></span>
+        <span class="status-text">Proxy Active</span>
+      </div>
     </div>
 
-    <nav class="nav">
+    <!-- Right: Configuration Link -->
+    <nav class="nav single-link">
       <ul>
-        <li><a routerLink="/dashboard" routerLinkActive="active">ScenariosDashbord</a></li>
-        <li><a routerLink="/SCENARIOS" routerLinkActive="active">Scenarios</a></li>
-        <li><a routerLink="/databse-config" routerLinkActive="active">Configuration</a></li>
-        <li><a routerLink="/metrics" routerLinkActive="active">JVMmetrics</a></li>
-        <li><a routerLink="/app-scenarios" routerLinkActive="active">appscenarios</a></li>
-        <li><a routerLink="/app-dashboard" routerLinkActive="active">appdashboard</a></li>
-
-
-
-
+        <li>
+          <a routerLink="/databse-config" routerLinkActive="active">Configuration</a>
+        </li>
       </ul>
     </nav>
   </div>
-  <div class="status-indicator">
-    <span class="dot"></span> Proxy Active
-  </div>
-  
 </header>
+
+<!-- Sidebar Navigation -->
+<div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="closeSidebar()"></div>
+<div class="sidebar" [class.active]="sidebarOpen">
+  <div class="sidebar-header">
+    <h3>Navigation</h3>
+    <button class="close-sidebar" (click)="closeSidebar()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  <div class="sidebar-content">
+    <ul class="sidebar-menu">
+      <li class="sidebar-item">
+        <a routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a routerLink="/SCENARIOS" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-flask"></i>
+          <span>SCENARIOS</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a routerLink="/app-scenarios" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>app-scenarios</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a routerLink="/app-dashboard" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>app-dashboard</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a routerLink="/metrics" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-chart-line"></i>
+          <span>Metrics</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a routerLink="/databse-config" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-cog"></i>
+          <span>Configuration</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a routerLink="/documentation" routerLinkActive="active" (click)="closeSidebar()">
+          <i class="fas fa-book"></i>
+          <span>Documentation</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
