@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-documentation',
+  selector: 'app-scenarios',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [CommonModule],
   template: `
     <div class="page-container">
-      <h1>Documentation</h1>
-      <p>View guides and API references</p>
+      <h1>Scenarios</h1>
+      <p>Manage test scenarios and templates</p>
     </div>
   `,
   styles: [`
@@ -19,4 +18,4 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class DocumentationComponent {}
+export class ScenariosComponent {} 

@@ -1,0 +1,173 @@
+// Dark Theme Variables
+$dark-bg: #1a1a1a;
+$dark-bg-light: #2d2d2d;
+$dark-text: #ffffff;
+$dark-text-muted: rgba(255, 255, 255, 0.7);
+$dark-border: #3d3d3d;
+$dark-primary: #4a6fa5;
+$dark-primary-light: #5a7fb5;
+$dark-hover: rgba(255, 255, 255, 0.1);
+
+// Dark Theme Styles
+body.dark-theme {
+  background-color: $dark-bg;
+  color: $dark-text;
+
+  // Header
+  .header {
+    background: linear-gradient(135deg, darken($dark-primary, 10%), darken($dark-primary, 20%));
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  // Navigation
+  .main-nav {
+    ul li a {
+      color: $dark-text-muted;
+
+      &:hover {
+        color: $dark-text;
+      }
+
+      &.active {
+        color: $dark-text;
+      }
+    }
+  }
+
+  // Cards
+  .card {
+    background-color: $dark-bg-light;
+    border-color: $dark-border;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+    .card-header {
+      border-bottom-color: $dark-border;
+    }
+
+    .card-footer {
+      border-top-color: $dark-border;
+    }
+  }
+
+  // Buttons
+  .btn {
+    &-primary {
+      background-color: $dark-primary;
+      border-color: $dark-primary;
+
+      &:hover {
+        background-color: $dark-primary-light;
+        border-color: $dark-primary-light;
+      }
+    }
+
+    &-outline-primary {
+      color: $dark-primary;
+      border-color: $dark-primary;
+
+      &:hover {
+        background-color: $dark-primary;
+        color: $dark-text;
+      }
+    }
+  }
+
+  // Inputs
+  input, select, textarea {
+    background-color: $dark-bg;
+    border-color: $dark-border;
+    color: $dark-text;
+
+    &:focus {
+      background-color: lighten($dark-bg, 5%);
+      border-color: $dark-primary;
+    }
+  }
+
+  // Tables
+  table {
+    color: $dark-text;
+
+    th {
+      background-color: $dark-bg-light;
+      border-color: $dark-border;
+    }
+
+    td {
+      border-color: $dark-border;
+    }
+
+    tbody tr {
+      &:hover {
+        background-color: $dark-hover;
+      }
+    }
+  }
+
+  // Mobile Navigation
+  .mobile-nav {
+    background-color: $dark-bg-light;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+
+    .mobile-nav-header {
+      border-bottom-color: $dark-border;
+
+      .logo {
+        color: $dark-primary;
+      }
+
+      .close-nav {
+        color: $dark-text-muted;
+
+        &:hover {
+          color: $dark-text;
+        }
+      }
+    }
+
+    nav ul li a {
+      color: $dark-text;
+
+      &:hover {
+        background-color: $dark-hover;
+      }
+
+      &.active {
+        background-color: rgba($dark-primary, 0.2);
+        color: $dark-primary-light;
+      }
+    }
+  }
+
+  // Charts
+  .chart-container {
+    background-color: $dark-bg-light;
+    border-color: $dark-border;
+  }
+
+  // Tooltips
+  .tooltip {
+    background-color: $dark-bg-light;
+    color: $dark-text;
+    border-color: $dark-border;
+  }
+
+  // Scrollbar
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $dark-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $dark-border;
+    border-radius: 5px;
+
+    &:hover {
+      background: lighten($dark-border, 10%);
+    }
+  }
+} 

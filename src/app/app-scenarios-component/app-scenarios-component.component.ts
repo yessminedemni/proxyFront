@@ -22,8 +22,8 @@ interface Scenario {
   selector: "app-app-scenarios-component",
   templateUrl: "./app-scenarios-component.component.html",
   styleUrls: ["./app-scenarios-component.component.scss"],
-  imports: [CommonModule,FormsModule,RouterModule  ],
-
+  standalone: true,
+  imports: [CommonModule,FormsModule,RouterModule],
 })
 export class AppScenariosComponent implements OnInit {
   scenarios: Scenario[] = []

@@ -1,19 +1,40 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
-import { FooterComponent } from './components/footer/footer.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    HeaderComponent,
-    FooterComponent,
-    RouterOutlet,
-],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  imports: [RouterModule, HeaderComponent, CommonModule],
+  template: `
+    <app-header></app-header>
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  `,
+  styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      flex: 1;
+      padding-top: 60px;
+      min-height: calc(100vh - 60px);
+      padding: 2rem;
+      background-color: var(--background-light);
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  `]
 })
-export class AppComponent {
-  title = 'My App'; // if you're using {{ title }}
-}
+export class AppComponent {}

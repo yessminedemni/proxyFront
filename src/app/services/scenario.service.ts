@@ -63,7 +63,6 @@ private scenariosSubject = new BehaviorSubject<Scenario[]>([]);
         scenarios.forEach((scenario) => {
           const details = this.scenarioDetails[scenario.name]
           if (details) {
-            scenario.description = details.description
             scenario.category = details.category
             scenario.impact = details.impact
           }

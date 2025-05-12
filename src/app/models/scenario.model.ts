@@ -1,23 +1,23 @@
 export interface Scenario {
-    error: null
-    isToggling: any
-    id?: number
-    name: string
-    enabled: boolean
-    description?: string
-    category?: string
-    impact?: "low" | "medium" | "high" | "critical"
+    id: number;
+    name: string;
+    originalName: string;
+    enabled: boolean;
+    description: string;
+    error: string | null;
+    isToggling: boolean;
+    category?: string;
+    impact?: string;
+    
+}
 
-  }
- 
-  
-  export interface StressTestStatus {
+export interface StressTestStatus {
     running: boolean;
     activeThreads: number;
     queriesExecuted: number;
     startTime?: Date;
     runningTime?: string;
-  }
+}
 
 
   
