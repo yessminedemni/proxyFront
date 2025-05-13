@@ -2,16 +2,18 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { CommonModule } from '@angular/common';
+import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule, HeaderComponent, CommonModule],
+  imports: [RouterModule, HeaderComponent, FooterComponent, CommonModule],
   template: `
     <app-header></app-header>
     <main class="main-content">
       <router-outlet></router-outlet>
     </main>
+    <app-footer></app-footer>
   `,
   styles: [`
     :host {
@@ -37,4 +39,6 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class AppComponent {}
+export class AppComponent {
+  title = 'mysql-proxy-dashboard';
+}

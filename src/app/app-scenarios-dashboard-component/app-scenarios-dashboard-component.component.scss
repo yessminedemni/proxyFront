@@ -56,6 +56,14 @@
   color: var(--text-primary);
   margin: 0;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-title h1 i {
+  color: var(--primary-color);
+  font-size: 24px;
 }
 
 .dashboard-actions {
@@ -267,15 +275,15 @@
 
 /* Different accent colors for different metrics */
 .metric-card[data-metric="cpu"] {
-  border-top: 3px solid var(--primary-color);
+  border-top: 4px solid #3f51b5;
 }
 
 .metric-card[data-metric="traffic"] {
-  border-top: 3px solid var(--success-color);
+  border-top: 4px solid #4caf50;
 }
 
 .metric-card[data-metric="response"] {
-  border-top: 3px solid var(--warning-color);
+  border-top: 4px solid #ff9800;
 }
 
 .metric-header {
@@ -298,7 +306,53 @@
 
 .metric-icon {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 16px;
+}
+
+.status-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  background-color: #e0e0e0;
+  color: #666;
+}
+
+.status-badge.active {
+  background-color: #4caf50;
+  color: white;
+}
+
+.metric-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.metric-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--primary-color);
+}
+
+.metric-card[data-metric="cpu"] .metric-badge {
+  background-color: rgba(63, 81, 181, 0.1);
+  color: #3f51b5;
+}
+
+.metric-card[data-metric="traffic"] .metric-badge {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.metric-card[data-metric="response"] .metric-badge {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
 }
 
 .chart-container {
