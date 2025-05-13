@@ -156,6 +156,108 @@ export class AppScenariosComponent implements OnInit {
           });
         }
   
+        // Find the Memory Load scenario
+        const memoryLoadScenario = data.find((item) => item.name === "memory_load");
+        console.log("Memory Load scenario:", memoryLoadScenario);
+  
+        if (memoryLoadScenario) {
+          // Add Memory Load scenario
+          this.scenarios.push({
+            id: memoryLoadScenario.id,
+            name: "Memory Load",
+            originalName: "memory_load", // Store original name for API calls
+            enabled: memoryLoadScenario.enabled,
+            description: "Simulates high memory usage to test system behavior under memory pressure",
+            category: "Performance",
+            impact: "High",
+            details: memoryLoadScenario.details || {},
+            isToggling: false,
+            error: null,
+          });
+        } else {
+          // If Memory Load scenario doesn't exist in the response, create a default one
+          this.scenarios.push({
+            id: 4,
+            name: "Memory Load",
+            originalName: "memory_load",
+            enabled: false,
+            description: "Simulates high memory usage to test system behavior under memory pressure",
+            category: "Performance",
+            impact: "High",
+            details: {}, // Initialize as empty object
+            isToggling: false,
+            error: null,
+          });
+        }
+  
+        // Find the Service Down scenario
+        const serviceDownScenario = data.find((item) => item.name === "service_down");
+        console.log("Service Down scenario:", serviceDownScenario);
+  
+        if (serviceDownScenario) {
+          // Add Service Down scenario
+          this.scenarios.push({
+            id: serviceDownScenario.id,
+            name: "Service Down",
+            originalName: "service_down",
+            enabled: serviceDownScenario.enabled,
+            description: "Simulates complete service outage to test system resilience",
+            category: "Availability",
+            impact: "Critical",
+            details: serviceDownScenario.details || {},
+            isToggling: false,
+            error: null,
+          });
+        } else {
+          // If Service Down scenario doesn't exist in the response, create a default one
+          this.scenarios.push({
+            id: 5,
+            name: "Service Down",
+            originalName: "service_down",
+            enabled: false,
+            description: "Simulates complete service outage to test system resilience",
+            category: "Availability",
+            impact: "Critical",
+            details: {},
+            isToggling: false,
+            error: null,
+          });
+        }
+
+        // Find the DB Down scenario
+        const dbDownScenario = data.find((item) => item.name === "db_down");
+        console.log("DB Down scenario:", dbDownScenario);
+  
+        if (dbDownScenario) {
+          // Add DB Down scenario
+          this.scenarios.push({
+            id: dbDownScenario.id,
+            name: "Database Down",
+            originalName: "db_down",
+            enabled: dbDownScenario.enabled,
+            description: "Simulates database connection failures and outages",
+            category: "Database",
+            impact: "Critical",
+            details: dbDownScenario.details || {},
+            isToggling: false,
+            error: null,
+          });
+        } else {
+          // If DB Down scenario doesn't exist in the response, create a default one
+          this.scenarios.push({
+            id: 6,
+            name: "Database Down",
+            originalName: "db_down",
+            enabled: false,
+            description: "Simulates database connection failures and outages",
+            category: "Database",
+            impact: "Critical",
+            details: {},
+            isToggling: false,
+            error: null,
+          });
+        }
+  
         console.log("Scenarios after processing:", this.scenarios);
         this.filteredScenarios = [...this.scenarios];
         this.isLoading = false;
@@ -167,15 +269,18 @@ export class AppScenariosComponent implements OnInit {
       },
     });
   }
-  getScenarioIcon(): string {
+  getScenarioIcon(scenario: Scenario): string {
     // Return different icons based on scenario category or name
-    if (this.filteredScenarios && this.filteredScenarios.length > 0) {
-      const scenario = this.filteredScenarios[0];
-      if (scenario.originalName === "cpu_load") {
-        return "fa-microchip";
-      } else if (scenario.originalName === "high_load") {
-        return "fa-tachometer-alt";
-      }
+    if (scenario.originalName === "cpu_load") {
+      return "fa-microchip";
+    } else if (scenario.originalName === "high_load") {
+      return "fa-tachometer-alt";
+    } else if (scenario.originalName === "memory_load") {
+      return "fa-memory";
+    } else if (scenario.originalName === "service_down") {
+      return "fa-power-off";
+    } else if (scenario.originalName === "db_down") {
+      return "fa-database";
     }
     return "fa-exclamation-circle";
   }
@@ -315,20 +420,26 @@ export class AppScenariosComponent implements OnInit {
     })
   }
 
-  
-
-  getCategoryIcon(): string {
+  getCategoryIcon(scenario: Scenario): string {
     // Return different icons based on scenario category
-    if (this.filteredScenarios && this.filteredScenarios.length > 0) {
-      const scenario = this.filteredScenarios[0]
-      if (scenario.category === "Performance") {
-        return "fa-tachometer-alt"
-      }
+    if (scenario.category === "Performance") {
+      return "fa-tachometer-alt"
+    } else if (scenario.category === "Availability") {
+      return "fa-plug"
+    } else if (scenario.category === "Database") {
+      return "fa-database"
     }
     return "fa-network-wired"
   }
 
-  getImpactClass(): string {
-    return "impact-high"
+  getImpactClass(scenario: Scenario): string {
+    if (scenario.impact === "Critical") {
+      return "impact-critical"
+    } else if (scenario.impact === "High") {
+      return "impact-high"
+    } else if (scenario.impact === "Medium") {
+      return "impact-medium"
+    }
+    return "impact-low"
   }
 }

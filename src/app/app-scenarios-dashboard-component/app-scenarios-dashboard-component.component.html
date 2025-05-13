@@ -129,6 +129,60 @@
           <canvas #responseTimeChart></canvas>
         </div>
       </div>
+
+      <div class="metric-card" *ngIf="matchesSearch('Memory Load')" data-metric="memory">
+        <div class="metric-header">
+          <h3 class="metric-title">
+            <i class="fas fa-memory metric-icon" aria-hidden="true"></i>
+            Memory Load
+            <span class="status-badge" [class.active]="metrics.scenarioStates?.memoryLoad">
+              {{ metrics.scenarioStates?.memoryLoad ? 'Active' : 'Inactive' }}
+            </span>
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-badge">{{ getLatestMetricValue('memoryLoad') | number:'1.0-0' }}%</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #memoryLoadChart></canvas>
+        </div>
+      </div>
+
+      <div class="metric-card" *ngIf="matchesSearch('Service Down')" data-metric="service">
+        <div class="metric-header">
+          <h3 class="metric-title">
+            <i class="fas fa-power-off metric-icon" aria-hidden="true"></i>
+            Service Down
+            <span class="status-badge" [class.active]="metrics.scenarioStates?.serviceDown">
+              {{ metrics.scenarioStates?.serviceDown ? 'Active' : 'Inactive' }}
+            </span>
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-badge">{{ getLatestMetricValue('serviceDown') | number:'1.0-0' }}%</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #serviceDownChart></canvas>
+        </div>
+      </div>
+
+      <div class="metric-card" *ngIf="matchesSearch('Database Down')" data-metric="database">
+        <div class="metric-header">
+          <h3 class="metric-title">
+            <i class="fas fa-database metric-icon" aria-hidden="true"></i>
+            Database Down
+            <span class="status-badge" [class.active]="metrics.scenarioStates?.dbDown">
+              {{ metrics.scenarioStates?.dbDown ? 'Active' : 'Inactive' }}
+            </span>
+          </h3>
+          <div class="metric-actions">
+            <div class="metric-badge">{{ getLatestMetricValue('dbDown') | number:'1.0-0' }}%</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #dbDownChart></canvas>
+        </div>
+      </div>
     </div>
   </div>
 </div>

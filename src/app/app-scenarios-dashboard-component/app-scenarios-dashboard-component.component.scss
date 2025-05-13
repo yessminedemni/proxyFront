@@ -286,6 +286,18 @@
   border-top: 4px solid #ff9800;
 }
 
+.metric-card[data-metric="memory"] {
+  border-top: 4px solid #9c27b0;
+}
+
+.metric-card[data-metric="service"] {
+  border-top: 4px solid #ff5722;
+}
+
+.metric-card[data-metric="database"] {
+  border-top: 4px solid #9c27b0;
+}
+
 .metric-header {
   display: flex;
   justify-content: space-between;
@@ -353,6 +365,21 @@
 .metric-card[data-metric="response"] .metric-badge {
   background-color: rgba(255, 152, 0, 0.1);
   color: #ff9800;
+}
+
+.metric-card[data-metric="memory"] .metric-badge {
+  background-color: rgba(156, 39, 176, 0.1);
+  color: #9c27b0;
+}
+
+.metric-card[data-metric="service"] .metric-badge {
+  background-color: rgba(255, 87, 34, 0.1);
+  color: #ff5722;
+}
+
+.metric-card[data-metric="database"] .metric-badge {
+  background-color: rgba(156, 39, 176, 0.1);
+  color: #9c27b0;
 }
 
 .chart-container {

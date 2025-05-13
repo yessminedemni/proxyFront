@@ -43,7 +43,7 @@
     <!-- Scenario Card -->
     <div *ngFor="let scenario of filteredScenarios" class="scenario-card" [ngClass]="{'enabled': scenario.enabled}">
       <div class="scenario-icon">
-        <i class="fas" [ngClass]="getScenarioIcon()"></i>
+        <i class="fas" [ngClass]="getScenarioIcon(scenario)"></i>
       </div>
       
       <div class="scenario-content">
@@ -51,10 +51,10 @@
           <h3>{{ scenario.name }}</h3>
           <div class="scenario-meta">
             <span class="category">
-              <i class="fas" [ngClass]="getCategoryIcon()"></i>
+              <i class="fas" [ngClass]="getCategoryIcon(scenario)"></i>
               {{ scenario.category }}
             </span>
-            <span class="impact" [ngClass]="getImpactClass()">
+            <span class="impact" [ngClass]="getImpactClass(scenario)">
               {{ scenario.impact }}
             </span>
           </div>

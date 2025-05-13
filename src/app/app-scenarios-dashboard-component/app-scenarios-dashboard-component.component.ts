@@ -27,10 +27,16 @@ interface AppScenarioMetrics {
   cpuLoad: MetricData[]
   trafficLoad: MetricData[]
   responseTime: MetricData[]
+  memoryLoad: MetricData[]
+  serviceDown: MetricData[]
+  dbDown: MetricData[]
   scenarioStates?: {
     cpuLoad: boolean
     highLoad: boolean
     return404: boolean
+    memoryLoad: boolean
+    serviceDown: boolean
+    dbDown: boolean
   }
 }
 
@@ -66,6 +72,9 @@ throw new Error('Method not implemented.')
   @ViewChild("cpuLoadChart") cpuLoadChartRef: ElementRef | undefined
   @ViewChild("trafficLoadChart") trafficLoadChartRef: ElementRef | undefined
   @ViewChild("responseTimeChart") responseTimeChartRef: ElementRef | undefined
+  @ViewChild("memoryLoadChart") memoryLoadChartRef: ElementRef | undefined
+  @ViewChild("serviceDownChart") serviceDownChartRef: ElementRef | undefined
+  @ViewChild("dbDownChart") dbDownChartRef: ElementRef | undefined
 
   appScenarios: AppScenario[] = []
   loading = true
@@ -78,16 +87,25 @@ throw new Error('Method not implemented.')
   cpuLoadChart: Chart | undefined
   trafficLoadChart: Chart | undefined
   responseTimeChart: Chart | undefined
+  memoryLoadChart: Chart | undefined
+  serviceDownChart: Chart | undefined
+  dbDownChart: Chart | undefined
 
   // Metrics data
   metrics: AppScenarioMetrics = {
     cpuLoad: [],
     trafficLoad: [],
     responseTime: [],
+    memoryLoad: [],
+    serviceDown: [],
+    dbDown: [],
     scenarioStates: {
       cpuLoad: false,
       highLoad: false,
       return404: false,
+      memoryLoad: false,
+      serviceDown: false,
+      dbDown: false,
     },
   }
 
@@ -165,6 +183,78 @@ throw new Error('Method not implemented.')
       },
       scenarioName: "return_404",
     },
+    {
+      id: "memoryLoad",
+      title: "Memory Load",
+      description: "Current memory utilization percentage",
+      unit: "%",
+      data: [],
+      color: "rgb(153, 102, 255)",
+      detailedDescription:
+        "Memory Load represents the percentage of system memory being utilized by the application. High memory usage can lead to performance degradation, out-of-memory errors, and system instability. The Memory Load scenario simulates high memory utilization to test application behavior under memory pressure.",
+      interpretation:
+        "Memory usage should generally stay below 80% for optimal performance. High memory consumption can lead to increased garbage collection activity, slower response times, and potential application crashes.",
+      recommendations: [
+        "Monitor and optimize memory-intensive operations",
+        "Implement proper memory cleanup and resource disposal",
+        "Consider memory pooling for frequently allocated objects",
+        "Set appropriate JVM memory limits and garbage collection parameters",
+        "Implement memory leak detection and monitoring",
+      ],
+      thresholds: {
+        warning: 80,
+        critical: 95,
+      },
+      scenarioName: "memory_load",
+    },
+    {
+      id: "serviceDown",
+      title: "Service Down",
+      description: "Service availability status",
+      unit: "%",
+      data: [],
+      color: "rgb(255, 87, 34)",
+      detailedDescription:
+        "Service Down scenario simulates complete service outage to test system resilience and failover mechanisms. This metric tracks the service availability and helps identify potential points of failure in the system.",
+      interpretation:
+        "Service availability should be maintained at 100% for optimal operation. Any drop in availability indicates potential service disruption that requires immediate attention.",
+      recommendations: [
+        "Implement robust failover mechanisms",
+        "Set up automated service recovery procedures",
+        "Monitor service dependencies and their health",
+        "Establish clear incident response procedures",
+        "Maintain backup services for critical components",
+      ],
+      thresholds: {
+        warning: 90,
+        critical: 80,
+      },
+      scenarioName: "service_down",
+    },
+    {
+      id: "dbDown",
+      title: "Database Down",
+      description: "Database availability status",
+      unit: "%",
+      data: [],
+      color: "rgb(156, 39, 176)",
+      detailedDescription:
+        "Database Down scenario simulates database connectivity issues and failures to test application resilience. This metric tracks database availability and helps identify potential points of failure in database operations.",
+      interpretation:
+        "Database availability should be maintained at 100% for optimal operation. Any drop in availability indicates potential database connectivity or performance issues that require immediate attention.",
+      recommendations: [
+        "Implement robust database failover mechanisms",
+        "Set up database connection pooling and retry mechanisms",
+        "Monitor database connection health and performance",
+        "Establish clear database incident response procedures",
+        "Maintain backup databases for critical operations",
+      ],
+      thresholds: {
+        warning: 90,
+        critical: 80,
+      },
+      scenarioName: "db_down",
+    },
   ]
 
   // Thresholds for metrics
@@ -175,7 +265,7 @@ throw new Error('Method not implemented.')
   }
 
   // Mock data for demonstration - in a real app, you'd get this from your backend
-  mockMetricsEnabled = false // Changed to false to use the backend API
+  mockMetricsEnabled = true // Changed to true to use mock data for testing
   lastUpdated: Date | null = null
 
   constructor(private http: HttpClient) {}
@@ -252,6 +342,12 @@ throw new Error('Method not implemented.')
         return this.metrics.scenarioStates.highLoad
       case "return_404":
         return this.metrics.scenarioStates.return404
+      case "memory_load":
+        return this.metrics.scenarioStates.memoryLoad
+      case "service_down":
+        return this.metrics.scenarioStates.serviceDown
+      case "db_down":
+        return this.metrics.scenarioStates.dbDown
       default:
         return false
     }
@@ -653,10 +749,412 @@ throw new Error('Method not implemented.')
       this.scenarioMetricInfo[2].chart = this.responseTimeChart
       this.scenarioMetricInfo[2].chartRef = this.responseTimeChartRef
     }
+
+    // Initialize Memory Load Chart
+    if (this.memoryLoadChartRef?.nativeElement) {
+      this.memoryLoadChart = new Chart(this.memoryLoadChartRef.nativeElement, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Memory Load (%)",
+              data: [],
+              borderColor: "rgb(153, 102, 255)",
+              backgroundColor: "rgba(153, 102, 255, 0.2)",
+              tension: 0.4,
+              fill: true,
+              borderWidth: 2,
+              pointRadius: 4,
+              pointBackgroundColor: "rgb(153, 102, 255)",
+              pointBorderColor: "#fff",
+              pointHoverRadius: 6,
+              pointHoverBackgroundColor: "rgb(153, 102, 255)",
+              pointHoverBorderColor: "#fff",
+              pointHoverBorderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              labels: {
+                boxWidth: 12,
+                usePointStyle: true,
+                pointStyle: "circle",
+                font: {
+                  size: 12,
+                },
+              },
+            },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              titleColor: "#333",
+              bodyColor: "#666",
+              borderColor: "#e0e0e0",
+              borderWidth: 1,
+              padding: 10,
+              displayColors: true,
+              callbacks: {
+                label: (context) => `Memory Load: ${context.parsed.y.toFixed(2)}%`,
+                afterLabel: (context) => {
+                  const isEnabled = this.getScenarioState("memory_load")
+                  return `Scenario: ${isEnabled ? "Active" : "Inactive"}`
+                },
+              },
+            },
+            title: {
+              display: false,
+              text: "Memory Load",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: "rgba(0, 0, 0, 0.05)",
+              },
+              ticks: {
+                color: "#666",
+                font: {
+                  size: 11,
+                },
+                callback: (value) => value + "%",
+              },
+              title: {
+                display: true,
+                text: "Memory Load (%)",
+                color: "#666",
+                font: {
+                  size: 12,
+                  weight: "normal",
+                },
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: "#666",
+                font: {
+                  size: 11,
+                },
+                maxRotation: 0,
+              },
+              title: {
+                display: true,
+                text: "Time",
+                color: "#666",
+                font: {
+                  size: 12,
+                  weight: "normal",
+                },
+              },
+            },
+          },
+          interaction: {
+            mode: "nearest",
+            axis: "x",
+            intersect: false,
+          },
+          animations: {
+            tension: {
+              duration: 1000,
+              easing: "linear",
+            },
+          },
+          elements: {
+            line: {
+              borderWidth: 2,
+            },
+          },
+        },
+      })
+
+      // Store chart reference in scenarioMetricInfo
+      this.scenarioMetricInfo[3].chart = this.memoryLoadChart
+      this.scenarioMetricInfo[3].chartRef = this.memoryLoadChartRef
+    }
+
+    // Initialize Service Down Chart
+    if (this.serviceDownChartRef?.nativeElement) {
+      this.serviceDownChart = new Chart(this.serviceDownChartRef.nativeElement, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Service Down (%)",
+              data: [],
+              borderColor: "rgb(255, 87, 34)",
+              backgroundColor: "rgba(255, 87, 34, 0.2)",
+              tension: 0.4,
+              fill: true,
+              borderWidth: 2,
+              pointRadius: 4,
+              pointBackgroundColor: "rgb(255, 87, 34)",
+              pointBorderColor: "#fff",
+              pointHoverRadius: 6,
+              pointHoverBackgroundColor: "rgb(255, 87, 34)",
+              pointHoverBorderColor: "#fff",
+              pointHoverBorderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              labels: {
+                boxWidth: 12,
+                usePointStyle: true,
+                pointStyle: "circle",
+                font: {
+                  size: 12,
+                },
+              },
+            },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              titleColor: "#333",
+              bodyColor: "#666",
+              borderColor: "#e0e0e0",
+              borderWidth: 1,
+              padding: 10,
+              displayColors: true,
+              callbacks: {
+                label: (context) => `Service Down: ${context.parsed.y.toFixed(2)}%`,
+                afterLabel: (context) => {
+                  const isEnabled = this.getScenarioState("service_down")
+                  return `Scenario: ${isEnabled ? "Active" : "Inactive"}`
+                },
+              },
+            },
+            title: {
+              display: false,
+              text: "Service Down",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: "rgba(0, 0, 0, 0.05)",
+              },
+              ticks: {
+                color: "#666",
+                font: {
+                  size: 11,
+                },
+                callback: (value) => value + "%",
+              },
+              title: {
+                display: true,
+                text: "Service Down (%)",
+                color: "#666",
+                font: {
+                  size: 12,
+                  weight: "normal",
+                },
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: "#666",
+                font: {
+                  size: 11,
+                },
+                maxRotation: 0,
+              },
+              title: {
+                display: true,
+                text: "Time",
+                color: "#666",
+                font: {
+                  size: 12,
+                  weight: "normal",
+                },
+              },
+            },
+          },
+          interaction: {
+            mode: "nearest",
+            axis: "x",
+            intersect: false,
+          },
+          animations: {
+            tension: {
+              duration: 1000,
+              easing: "linear",
+            },
+          },
+          elements: {
+            line: {
+              borderWidth: 2,
+            },
+          },
+        },
+      })
+
+      // Store chart reference in scenarioMetricInfo
+      this.scenarioMetricInfo[4].chart = this.serviceDownChart
+      this.scenarioMetricInfo[4].chartRef = this.serviceDownChartRef
+    }
+
+    // Initialize DB Down Chart
+    if (this.dbDownChartRef?.nativeElement) {
+      this.dbDownChart = new Chart(this.dbDownChartRef.nativeElement, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Database Down (%)",
+              data: [],
+              borderColor: "rgb(156, 39, 176)",
+              backgroundColor: "rgba(156, 39, 176, 0.2)",
+              tension: 0.4,
+              fill: true,
+              borderWidth: 2,
+              pointRadius: 4,
+              pointBackgroundColor: "rgb(156, 39, 176)",
+              pointBorderColor: "#fff",
+              pointHoverRadius: 6,
+              pointHoverBackgroundColor: "rgb(156, 39, 176)",
+              pointHoverBorderColor: "#fff",
+              pointHoverBorderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              labels: {
+                boxWidth: 12,
+                usePointStyle: true,
+                pointStyle: "circle",
+                font: {
+                  size: 12,
+                },
+              },
+            },
+            tooltip: {
+              mode: "index",
+              intersect: false,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              titleColor: "#333",
+              bodyColor: "#666",
+              borderColor: "#e0e0e0",
+              borderWidth: 1,
+              padding: 10,
+              displayColors: true,
+              callbacks: {
+                label: (context) => `Database Down: ${context.parsed.y.toFixed(2)}%`,
+                afterLabel: (context) => {
+                  const isEnabled = this.getScenarioState("db_down")
+                  return `Scenario: ${isEnabled ? "Active" : "Inactive"}`
+                },
+              },
+            },
+            title: {
+              display: false,
+              text: "Database Down",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: "rgba(0, 0, 0, 0.05)",
+              },
+              ticks: {
+                color: "#666",
+                font: {
+                  size: 11,
+                },
+                callback: (value) => value + "%",
+              },
+              title: {
+                display: true,
+                text: "Database Down (%)",
+                color: "#666",
+                font: {
+                  size: 12,
+                  weight: "normal",
+                },
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: "#666",
+                font: {
+                  size: 11,
+                },
+                maxRotation: 0,
+              },
+              title: {
+                display: true,
+                text: "Time",
+                color: "#666",
+                font: {
+                  size: 12,
+                  weight: "normal",
+                },
+              },
+            },
+          },
+          interaction: {
+            mode: "nearest",
+            axis: "x",
+            intersect: false,
+          },
+          animations: {
+            tension: {
+              duration: 1000,
+              easing: "linear",
+            },
+          },
+          elements: {
+            line: {
+              borderWidth: 2,
+            },
+          },
+        },
+      })
+
+      // Store chart reference in scenarioMetricInfo
+      this.scenarioMetricInfo[5].chart = this.dbDownChart
+      this.scenarioMetricInfo[5].chartRef = this.dbDownChartRef
+    }
   }
 
   updateCharts(): void {
-    if (!this.cpuLoadChart || !this.trafficLoadChart || !this.responseTimeChart) return
+    if (!this.cpuLoadChart || !this.trafficLoadChart || !this.responseTimeChart || !this.memoryLoadChart || !this.serviceDownChart || !this.dbDownChart) return
 
     // Format time labels for better readability
     const formatTime = (timestamp: number) => {
@@ -707,6 +1205,60 @@ throw new Error('Method not implemented.')
       this.responseTimeChart.data.datasets[0].backgroundColor = "rgba(54, 162, 235, 0.2)"
     }
     this.responseTimeChart.update()
+
+    // Update Memory Load Chart
+    this.memoryLoadChart.data.labels = this.metrics.memoryLoad.map((item) => formatTime(item.timestamp))
+    this.memoryLoadChart.data.datasets[0].data = this.metrics.memoryLoad.map((item) => item.value)
+
+    // Update scenarioMetricInfo data
+    this.scenarioMetricInfo[3].data = this.metrics.memoryLoad
+
+    // Update chart colors based on scenario state
+    const memoryLoadEnabled = this.getScenarioState("memory_load")
+    if (memoryLoadEnabled) {
+      this.memoryLoadChart.data.datasets[0].borderColor = "rgb(153, 102, 255)"
+      this.memoryLoadChart.data.datasets[0].backgroundColor = "rgba(153, 102, 255, 0.2)"
+    } else {
+      this.memoryLoadChart.data.datasets[0].borderColor = "rgb(75, 192, 192)"
+      this.memoryLoadChart.data.datasets[0].backgroundColor = "rgba(75, 192, 192, 0.2)"
+    }
+    this.memoryLoadChart.update()
+
+    // Update Service Down Chart
+    this.serviceDownChart.data.labels = this.metrics.serviceDown.map((item) => formatTime(item.timestamp))
+    this.serviceDownChart.data.datasets[0].data = this.metrics.serviceDown.map((item) => item.value)
+
+    // Update scenarioMetricInfo data
+    this.scenarioMetricInfo[4].data = this.metrics.serviceDown
+
+    // Update chart colors based on scenario state
+    const serviceDownEnabled = this.getScenarioState("service_down")
+    if (serviceDownEnabled) {
+      this.serviceDownChart.data.datasets[0].borderColor = "rgb(255, 87, 34)"
+      this.serviceDownChart.data.datasets[0].backgroundColor = "rgba(255, 87, 34, 0.2)"
+    } else {
+      this.serviceDownChart.data.datasets[0].borderColor = "rgb(75, 192, 192)"
+      this.serviceDownChart.data.datasets[0].backgroundColor = "rgba(75, 192, 192, 0.2)"
+    }
+    this.serviceDownChart.update()
+
+    // Update DB Down Chart
+    this.dbDownChart.data.labels = this.metrics.dbDown.map((item) => formatTime(item.timestamp))
+    this.dbDownChart.data.datasets[0].data = this.metrics.dbDown.map((item) => item.value)
+
+    // Update scenarioMetricInfo data
+    this.scenarioMetricInfo[5].data = this.metrics.dbDown
+
+    // Update chart colors based on scenario state
+    const dbDownEnabled = this.getScenarioState("db_down")
+    if (dbDownEnabled) {
+      this.dbDownChart.data.datasets[0].borderColor = "rgb(156, 39, 176)"
+      this.dbDownChart.data.datasets[0].backgroundColor = "rgba(156, 39, 176, 0.2)"
+    } else {
+      this.dbDownChart.data.datasets[0].borderColor = "rgb(75, 192, 192)"
+      this.dbDownChart.data.datasets[0].backgroundColor = "rgba(75, 192, 192, 0.2)"
+    }
+    this.dbDownChart.update()
   }
 
   fetchAppScenarios(): Observable<AppScenario[]> {
@@ -738,6 +1290,22 @@ throw new Error('Method not implemented.')
             category: "Performance",
             impact: "Critical",
           },
+          {
+            id: 4,
+            name: "memory_load",
+            enabled: false,
+            description: "Simulates high memory usage and potential memory leaks",
+            category: "Performance",
+            impact: "High",
+          },
+          {
+            id: 5,
+            name: "service_down",
+            enabled: false,
+            description: "Simulates service outage and degradation",
+            category: "Resilience",
+            impact: "Critical",
+          },
         ])
       }),
     )
@@ -765,6 +1333,9 @@ throw new Error('Method not implemented.')
     const cpuLoadEnabled = this.appScenarios.find((s) => s.name === "cpu_load")?.enabled || false
     const highLoadEnabled = this.appScenarios.find((s) => s.name === "high_load")?.enabled || false
     const return404Enabled = this.appScenarios.find((s) => s.name === "return_404")?.enabled || false
+    const memoryLoadEnabled = this.appScenarios.find((s) => s.name === "memory_load")?.enabled || false
+    const serviceDownEnabled = this.appScenarios.find((s) => s.name === "service_down")?.enabled || false
+    const dbDownEnabled = this.appScenarios.find((s) => s.name === "db_down")?.enabled || false
 
     // Generate realistic values based on scenario status
     const cpuLoadValue = cpuLoadEnabled
@@ -779,16 +1350,34 @@ throw new Error('Method not implemented.')
       ? 400 + Math.random() * 300 // 400-700ms when enabled
       : 50 + Math.random() * 100 // 50-150ms when disabled
 
+    const memoryLoadValue = memoryLoadEnabled
+      ? 85 + Math.random() * 10 // 85-95% when enabled (high memory pressure)
+      : 30 + Math.random() * 20 // 30-50% when disabled (normal usage)
+
+    const serviceDownValue = serviceDownEnabled
+      ? 60 + Math.random() * 30 // 60-90% when enabled (service degradation)
+      : 95 + Math.random() * 5 // 95-100% when disabled (normal operation)
+
+    const dbDownValue = dbDownEnabled
+      ? 50 + Math.random() * 40 // 50-90% when enabled (database issues)
+      : 98 + Math.random() * 2 // 98-100% when disabled (normal operation)
+
     // Add new data points
     this.metrics.cpuLoad.push({ timestamp: now, value: cpuLoadValue })
     this.metrics.trafficLoad.push({ timestamp: now, value: trafficLoadValue })
     this.metrics.responseTime.push({ timestamp: now, value: responseTimeValue })
+    this.metrics.memoryLoad.push({ timestamp: now, value: memoryLoadValue })
+    this.metrics.serviceDown.push({ timestamp: now, value: serviceDownValue })
+    this.metrics.dbDown.push({ timestamp: now, value: dbDownValue })
 
     // Keep only the last 10 data points
     if (this.metrics.cpuLoad.length > 10) {
       this.metrics.cpuLoad.shift()
       this.metrics.trafficLoad.shift()
       this.metrics.responseTime.shift()
+      this.metrics.memoryLoad.shift()
+      this.metrics.serviceDown.shift()
+      this.metrics.dbDown.shift()
     }
 
     // Update scenario states
@@ -796,6 +1385,9 @@ throw new Error('Method not implemented.')
       cpuLoad: cpuLoadEnabled,
       highLoad: highLoadEnabled,
       return404: return404Enabled,
+      memoryLoad: memoryLoadEnabled,
+      serviceDown: serviceDownEnabled,
+      dbDown: dbDownEnabled,
     }
 
     return this.metrics
@@ -806,10 +1398,16 @@ throw new Error('Method not implemented.')
       cpuLoad: [],
       trafficLoad: [],
       responseTime: [],
+      memoryLoad: [],
+      serviceDown: [],
+      dbDown: [],
       scenarioStates: {
         cpuLoad: false,
         highLoad: false,
         return404: false,
+        memoryLoad: false,
+        serviceDown: false,
+        dbDown: false,
       },
     }
   }
@@ -823,6 +1421,9 @@ throw new Error('Method not implemented.')
         cpuLoad: this.appScenarios.find((s) => s.name === "cpu_load")?.enabled || false,
         highLoad: this.appScenarios.find((s) => s.name === "high_load")?.enabled || false,
         return404: this.appScenarios.find((s) => s.name === "return_404")?.enabled || false,
+        memoryLoad: this.appScenarios.find((s) => s.name === "memory_load")?.enabled || false,
+        serviceDown: this.appScenarios.find((s) => s.name === "service_down")?.enabled || false,
+        dbDown: this.appScenarios.find((s) => s.name === "db_down")?.enabled || false,
       }
     }
   }
@@ -1202,6 +1803,9 @@ throw new Error('Method not implemented.')
         } else if (metricInfo.id === "responseTime") {
           impactText =
             "Increased response times directly impact user experience and satisfaction. Slow responses can lead to abandoned transactions, reduced user engagement, and potential business impact."
+        } else if (metricInfo.id === "memoryLoad") {
+          impactText =
+            "High memory usage can lead to performance degradation, out-of-memory errors, and system instability. It affects the application's capacity and may require infrastructure adjustments."
         }
 
         const impactLines = pdf.splitTextToSize(impactText, contentWidth)
@@ -1316,6 +1920,8 @@ throw new Error('Method not implemented.')
         return "fa-microchip"
       case "high_load":
         return "fa-server"
+      case "memory_load":
+        return "fa-memory"
       default:
         // If no specific match, try to determine by category
         return this.getCategoryIconByName(targetScenario.category)
@@ -1351,6 +1957,8 @@ throw new Error('Method not implemented.')
         return "fa-shield-alt"
       case "resilience":
         return "fa-bomb"
+      case "memory":
+        return "fa-memory"
       default:
         return "fa-folder"
     }
