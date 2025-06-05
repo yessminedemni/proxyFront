@@ -155,10 +155,14 @@
             <span *ngIf="isAppLoading" class="spinner-border spinner-border-sm me-2"></span>
             Save Configuration
           </button>
-          <button type="button" class="btn btn-secondary me-2 mb-2" (click)="testAppConnection()" [disabled]="isAppLoading">
-            <span *ngIf="isAppLoading" class="spinner-border spinner-border-sm me-2"></span>
-            Test Connection
-          </button>
+         <button type="button" class="btn btn-secondary me-2 mb-2"
+        (click)="onAppSubmit()"
+        [disabled]="isAppLoading">
+  <span *ngIf="isAppLoading" class="spinner-border spinner-border-sm me-2"></span>
+  Test Connection
+</button>
+
+
           <button *ngIf="appConfigForm.get('useAppProxy')?.value" type="button" class="btn btn-danger me-2 mb-2" (click)="stopAppProxy()" [disabled]="isAppLoading">
             <span *ngIf="isAppLoading" class="spinner-border spinner-border-sm me-2"></span>
             Stop Proxy

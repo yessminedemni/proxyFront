@@ -1,4 +1,4 @@
-.chaos-dashboard {
+chaos-dashboard {
   display: flex;
   flex-direction: column;
   max-width: 1200px;
@@ -7,6 +7,7 @@
   font-family: 'Inter', -apple-system, sans-serif;
   color: #333;
   background-color: #f8f9fa;
+
 
   .dashboard-header {
     margin-bottom: 2rem;
@@ -19,6 +20,7 @@
       font-weight: 600;
     }
 
+   
     p {
       font-size: 1.1rem;
       color: #5d6778;
@@ -33,6 +35,7 @@
     position: relative;
     margin-bottom: 1.5rem;
 
+
     input {
       width: 100%;
       max-width: 500px;
@@ -42,7 +45,8 @@
       font-size: 1rem;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
-      &:focus {
+
+       &:focus {
         outline: none;
         border-color: #4a6fa5;
         box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
@@ -53,7 +57,7 @@
       }
     }
 
-    i {
+     i {
       position: absolute;
       right: calc(50% - 240px);
       top: 50%;
@@ -73,7 +77,7 @@
       display: flex;
       justify-content: center;
 
-      .refresh-btn {
+     .refresh-btn {
         padding: 0.75rem 1.5rem;
         border-radius: 6px;
         background: #4a6fa5;
@@ -85,7 +89,7 @@
         align-items: center;
         gap: 0.5rem;
         transition: background 0.2s ease;
-
+       
         &:hover {
           background: #3a5a80;
         }
@@ -109,7 +113,7 @@
     justify-content: center;
     padding: 3rem;
 
-    .spinner {
+   .spinner {
       width: 40px;
       height: 40px;
       border: 4px solid rgba(74, 111, 165, 0.2);
@@ -119,7 +123,7 @@
       margin-bottom: 1rem;
     }
 
-    @keyframes spin {
+ @keyframes spin {
       to {
         transform: rotate(360deg);
       }
@@ -131,7 +135,7 @@
     }
   }
 
-  .error-message {
+   .error-message {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -141,7 +145,7 @@
     border-radius: 4px;
     margin-bottom: 1.5rem;
 
-    i {
+   i {
       color: #842029;
       font-size: 1.5rem;
     }
@@ -164,14 +168,12 @@
         background: #842029;
         color: white;
       }
-    }
-  }
+    }}
 
-  .scenarios-container {
+ .scenarios-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
-
     .scenario-card {
       display: flex;
       background-color: white;
@@ -184,7 +186,6 @@
       &.enabled {
         border-left-color: #4a6fa5;
       }
-
       &:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -203,22 +204,25 @@
           transition: all 0.3s ease;
         }
       }
+      
 
-      &.enabled .scenario-icon {
+       &.enabled .scenario-icon {
         color: #4a6fa5;
       }
 
-      .scenario-content {
+       .scenario-content {
         flex: 1;
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
+
 
         .scenario-header {
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
           margin-bottom: 1rem;
+
 
           h3 {
             margin: 0;
@@ -227,6 +231,7 @@
             font-weight: 600;
           }
 
+         
           .scenario-meta {
             display: flex;
             gap: 1rem;
@@ -253,7 +258,7 @@
                 color: #0c6e9e;
               }
 
-              &.impact-medium {
+               &.impact-medium {
                 background-color: #f8f7e8;
                 color: #8a6d3b;
               }
@@ -271,7 +276,7 @@
           }
         }
 
-        .scenario-description {
+      .scenario-description {
           color: #5d6778;
           margin-bottom: 1.5rem;
           line-height: 1.5;
@@ -304,6 +309,7 @@
           }
         }
 
+     
         .scenario-footer {
           display: flex;
           justify-content: space-between;
@@ -332,6 +338,7 @@
               }
             }
           }
+
 
           .toggle-btn {
             padding: 0.5rem 1rem;
@@ -368,7 +375,7 @@
     }
   }
 
-  .dashboard-info {
+   .dashboard-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
@@ -408,6 +415,7 @@
     }
   }
 }
+
 
 @media (max-width: 768px) {
   .chaos-dashboard {

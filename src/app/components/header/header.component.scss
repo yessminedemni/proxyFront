@@ -38,6 +38,12 @@ $transition: all 0.3s ease;
     }
   }
 
+  // Add this new class for the right side of the header
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+
   .menu-trigger {
     background: none;
     border: none;
@@ -681,4 +687,127 @@ $transition: all 0.3s ease;
       border-radius: 50%;
     }
   }
+}
+
+// Add this to your existing SCSS file
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+// Make sure the menu trigger still looks good next to the notification bell
+.menu-trigger {
+  margin-left: 8px;
+}
+
+.debug-section {
+  padding: 0 24px 16px;
+  margin-top: 16px;
+}
+
+.test-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.test-button {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  i {
+    font-size: 16px;
+  }
+  
+  &:hover {
+    background-color: #3182ce;
+  }
+  
+  &:active {
+    background-color: #2b6cb0;
+  }
+}
+
+// Add these styles to your existing SCSS file
+
+.critical-button {
+  background-color: #e53e3e;
+}
+
+.critical-button:hover {
+  background-color: #c53030;
+}
+
+.critical-button:active {
+  background-color: #9b2c2c;
+}
+
+// Make the notification bell more visible
+notification-bell {
+  display: block;
+  position: relative;
+  z-index: 1001;
+}
+// Add these styles to your existing header.component.scss
+
+.nav-link {
+  position: relative;
+  transition: all 0.3s ease;
+  
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    
+    &:hover {
+      background-color: transparent;
+      transform: none;
+    }
+    
+    .nav-title,
+    .nav-description {
+      color: #999;
+    }
+    
+    i {
+      color: #999;
+    }
+  }
+  
+  .lock-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #999;
+  }
+}
+
+// Optional: Add a subtle visual indicator for restricted navigation
+.nav-link.disabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.1) 2px,
+    rgba(255, 255, 255, 0.1) 4px
+  );
+  pointer-events: none;
 }

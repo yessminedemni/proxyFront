@@ -7,6 +7,7 @@ import { AppScenariosComponent } from './app-scenarios-component/app-scenarios-c
 import { AppScenariosDashboardComponentComponent } from './app-scenarios-dashboard-component/app-scenarios-dashboard-component.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ScenarioCardComponent } from './components/scenario-card/scenario-card.component';
+import { HelloPageComponent } from './hello-page/hello-page.component';
 
 export const routes: Routes = [
   {
@@ -53,8 +54,15 @@ export const routes: Routes = [
     component: ScenarioCardComponent,
     data: { showScenarios: true }
   },
+  
+  {
+    path: 'hello',
+    component: HelloPageComponent,
+    data: { showScenarios: true }
+  },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: 'hello'
   }
+
 ];

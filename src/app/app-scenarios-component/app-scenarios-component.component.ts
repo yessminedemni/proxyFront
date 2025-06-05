@@ -1,4 +1,4 @@
-import { Component, type OnInit } from "@angular/core"
+import { Component, TrackByFunction, type OnInit } from "@angular/core"
 import type { HttpErrorResponse } from "@angular/common/http"
 import { AppScenarioService } from "../services/AppScenarioService.service"
 import { CommonModule } from "@angular/common"
@@ -23,7 +23,7 @@ interface Scenario {
   templateUrl: "./app-scenarios-component.component.html",
   styleUrls: ["./app-scenarios-component.component.scss"],
   standalone: true,
-  imports: [CommonModule,FormsModule,RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule], // Make sure this is included
 })
 export class AppScenariosComponent implements OnInit {
   scenarios: Scenario[] = []

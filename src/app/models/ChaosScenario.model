@@ -1,0 +1,10 @@
+export interface ChaosScenario {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  enabled: boolean;
+  details: Record<string, string>;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  updatedAt: Date;
+}

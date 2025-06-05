@@ -1,11 +1,13 @@
 <header class="header">
   <div class="logo">
     <i class="fas fa-database"></i>
-    <span>MySQL Proxy</span>
+    <span>ChaosOps</span>
   </div>
-  <button class="menu-trigger" (click)="toggleMenu()">
-    <i class="fas fa-bars"></i>
-  </button>
+  <div class="header-right">
+    <button class="menu-trigger" (click)="toggleMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
 </header>
 
 <div class="menu-overlay" [class.open]="isMenuOpen" [ngClass]="{'dark-theme': isDarkTheme}">
@@ -41,4 +43,5 @@
       </label>
     </div>
   </nav>
+  
 </div>

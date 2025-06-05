@@ -1,0 +1,53 @@
+<div class="page-wrapper">
+  <!-- Header Navigation -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        ChaosOps
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <div class="hello-container">
+      <div class="platform-header">
+        <div class="platform-icon">⚡</div>
+        <h1>Chaos Engineering Platform</h1>
+        <p class="subtitle">
+          Advanced chaos injection and monitoring system designed to strengthen your application resilience through controlled failure scenarios and comprehensive observability.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon app">🔧</div>
+          <div class="feature-title">Application Layer</div>
+          <div class="feature-desc">Simulate network failures, service interruptions, and resource constraints</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon database">🗄️</div>
+          <div class="feature-title">Database Layer</div>
+          <div class="feature-desc">Test connection failures, query timeouts, and data consistency scenarios</div>
+        </div>
+      </div>
+
+      <div class="stats-container">
+        <div class="stats-content">
+          <span class="stats-number">12</span>
+          <span class="stats-label">Active Chaos Scenarios</span>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <button class="config-button" (click)="goToConfiguration()">
+          Launch Configuration Dashboard
+        </button>
+        <button class="config-button btn-secondary" (click)="viewDocumentation()">
+          View Documentation
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

@@ -40,4 +40,3 @@ export class DatabaseConfigService {
     return this.http.get(`${this.apiUrl}/config`)
   }
 }
-

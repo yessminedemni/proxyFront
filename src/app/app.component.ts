@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from './components/footer/footer.component';
@@ -9,7 +9,7 @@ import { FooterComponent } from './components/footer/footer.component';
   standalone: true,
   imports: [RouterModule, HeaderComponent, FooterComponent, CommonModule],
   template: `
-    <app-header></app-header>
+    <app-header *ngIf="!hideHeader"></app-header>
     <main class="main-content">
       <router-outlet></router-outlet>
     </main>
@@ -41,4 +41,13 @@ import { FooterComponent } from './components/footer/footer.component';
 })
 export class AppComponent {
   title = 'mysql-proxy-dashboard';
+  hideHeader = false;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.hideHeader = ['/hello', '/configuration'].includes(event.url);
+      }
+    });
+  }
 }

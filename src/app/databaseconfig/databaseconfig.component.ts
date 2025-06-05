@@ -99,66 +99,164 @@ export class DatabaseconfigComponent implements OnInit {
       }
     })
   }
-  initAppForm() {
-    this.appConfigForm = this.fb.group({
-      applicationType: ["REST API", Validators.required],
-      appHost: ["localhost", Validators.required],
-      appPort: ["8080", [Validators.required, Validators.min(1), Validators.max(65535)]],
-      appName: ["", Validators.required],
-      useCustomEndpoint: [false],
-      customEndpoint: [""],
-      appUsername: ["", Validators.required],
-      appPassword: ["", Validators.required],
-      apiPath: ["", Validators.required], // Added API path field
-      healthEndpoint: ["/actuator/health"], // Added health endpoint for connection testing
-      authType: ["None"], // Added authentication type
-      generatedEndpoint: [""],
-      useAppProxy: [false],
-      appProxyHost: ["localhost", Validators.required],
-      appProxyPort: ["3303", [Validators.required, Validators.min(1), Validators.max(65535)]], // Updated to 3303
-    });
-  
-    this.appConfigForm.valueChanges.subscribe((val: { useCustomEndpoint: any; appHost: any; appPort: any; apiPath: string }) => {
-      if (!val.useCustomEndpoint) {
-        let url = `http://${val.appHost}:${val.appPort}`;
-        if (val.apiPath) {
-          if (!val.apiPath.startsWith("/")) {
-            url += "/";
-          }
-          url += val.apiPath;
-        }
-        this.appConfigForm.get("generatedEndpoint")?.setValue(url, { emitEvent: false });
-      }
-    });
-  }
-  
-  onAppSubmit() {
-    if (this.appConfigForm.valid) {
-      this.isAppLoading = true;
-      this.connectionStatus = "connecting";
-      const payload = this.buildAppPayload();
-  
-      this.appConfigService.saveAppConfig(payload).subscribe({
-        next: () => {
-          this.appMessage = "Application config saved!";
-          this.isAppError = false;
-          if (payload.useAppProxy) {
-            this.testAppProxyConnection();
-          } else {
-            this.isAppLoading = false;
-            this.connectionStatus = "connected";
-          }
-        },
-        error: (err) => {
-          this.appMessage = "Failed to save application config: " + err.message;
-          this.isAppError = true;
-          this.isAppLoading = false;
-          this.connectionStatus = "failed";
-        },
-      });
+  initAppForm(): void {
+  this.appConfigForm = this.fb.group({
+    applicationType: ["REST API", Validators.required],
+    appHost: ["localhost", Validators.required],
+    appPort: ["8080", [Validators.required, Validators.min(1), Validators.max(65535)]],
+    appName: ["", Validators.required],
+    useCustomEndpoint: [false],
+    customEndpoint: [""],
+    appUsername: ["", Validators.required],
+    appPassword: ["", Validators.required],
+    apiPath: [""], // Start without validator
+    healthEndpoint: ["/actuator/health"],
+    authType: ["None"],
+    generatedEndpoint: [""],
+    useAppProxy: [false],
+    appProxyHost: ["localhost", Validators.required],
+    appProxyPort: ["3303", [Validators.required, Validators.min(1), Validators.max(65535)]],
+  });
+
+  // 🧠 Conditional validators
+  this.appConfigForm.get("useCustomEndpoint")?.valueChanges.subscribe((useCustom) => {
+    const customEndpoint = this.appConfigForm.get("customEndpoint");
+    const apiPath = this.appConfigForm.get("apiPath");
+
+    if (useCustom) {
+      customEndpoint?.setValidators([Validators.required]);
+      apiPath?.clearValidators();
+    } else {
+      customEndpoint?.clearValidators();
+      apiPath?.setValidators([Validators.required]);
     }
+
+    customEndpoint?.updateValueAndValidity();
+    apiPath?.updateValueAndValidity();
+  });
+
+  // Auto-generate endpoint URL
+  this.appConfigForm.valueChanges.subscribe((val) => {
+    if (!val.useCustomEndpoint) {
+      let url = `http://${val.appHost}:${val.appPort}`;
+      if (val.apiPath) {
+        if (!val.apiPath.startsWith("/")) {
+          url += "/";
+        }
+        url += val.apiPath;
+      }
+      this.appConfigForm.get("generatedEndpoint")?.setValue(url, { emitEvent: false });
+    }
+  });
+}
+
+onAppSubmit(): void {
+  if (this.appConfigForm.valid) {
+    this.isAppLoading = true;
+    this.connectionStatus = "connecting";
+
+    const payload = this.buildAppPayload();
+
+    this.appConfigService.saveAppConfig(payload).subscribe({
+      next: () => {
+        this.appMessage = "Application config saved!";
+        this.isAppError = false;
+
+        if (payload.useAppProxy) {
+          this.testAppProxyConnectionWithRedirect(payload);
+        } else {
+          this.testAppConnectionWithRedirect();
+        }
+      },
+      error: (err) => {
+        this.appMessage = "Failed to save application config: " + err.message;
+        this.isAppError = true;
+        this.isAppLoading = false;
+        this.connectionStatus = "failed";
+      },
+    });
+  } else {
+    this.markFormGroupTouched(this.appConfigForm);
+    this.logFormErrors(); // 👈 Add this to help debug
+    this.appMessage = "Please fill all required fields.";
+    this.isAppError = true;
+    this.isAppLoading = false; // ❗ Ensure spinner stops even on error
   }
-  
+}
+private logFormErrors(): void {
+  Object.keys(this.appConfigForm.controls).forEach((key) => {
+    const control = this.appConfigForm.get(key);
+    if (control && control.invalid) {
+      console.warn(`❌ Field "${key}" is invalid. Errors:`, control.errors);
+    }
+  });
+}
+
+testAppConnectionWithRedirect(): void {
+  if (this.appConfigForm.valid) {
+    this.isAppLoading = true;
+    this.connectionStatus = "connecting";
+
+    const payload = this.buildAppPayload(); // 👈 Build it inside
+
+    this.appConfigService.testAppConnection(payload).subscribe({
+      next: () => {
+        this.appMessage = "App connection successful!";
+        this.isAppError = false;
+        this.connectionStatus = "connected";
+        this.showConnectionNotification(true);
+        this.router.navigate(["/app-scenarios"]);
+      },
+      error: (err) => {
+        this.appMessage = "App connection failed: " + err.message;
+        this.isAppError = true;
+        this.connectionStatus = "failed";
+        this.showConnectionNotification(false);
+      },
+      complete: () => {
+        this.isAppLoading = false;
+      },
+    });
+  } else {
+    this.markFormGroupTouched(this.appConfigForm);
+  }
+}
+
+
+
+
+testAppProxyConnectionWithRedirect(payload: any): void {
+  const config = {
+    targetHost: payload.host,
+    targetPort: payload.port.toString(),
+    proxyPort: payload.proxyPort.toString(),
+  };
+
+  this.isAppTestingConnection = true;
+  this.connectionStatus = "connecting";
+
+  this.appConfigService.testAppProxyConnection(config).subscribe({
+    next: () => {
+      this.appMessage = "Proxy test successful!";
+      this.isAppError = false;
+      this.connectionStatus = "connected";
+      this.isAppTestingConnection = false;
+
+      this.showConnectionNotification(true);
+      this.router.navigate(["/app-scenarios"]);
+    },
+    error: (err) => {
+      this.appMessage = "Proxy test failed: " + err.message;
+      this.isAppError = true;
+      this.connectionStatus = "failed";
+      this.isAppTestingConnection = false;
+
+      this.showConnectionNotification(false);
+    },
+  });
+}
+
+
 
   buildDbPayload() {
     const val = this.dbConfigForm.value
@@ -194,45 +292,48 @@ export class DatabaseconfigComponent implements OnInit {
     }
   }
 
-  testAppConnection() {
-    if (this.appConfigForm.valid) {
-      const payload = this.buildAppPayload()
-      this.isAppLoading = true
-      this.connectionStatus = "connecting"
+ testAppConnection() {
+  if (this.appConfigForm.valid) {
+    this.isAppLoading = true;
+    this.connectionStatus = "connecting";
 
-      this.appConfigService.testAppConnection(payload).subscribe({
-        next: (response) => {
-          console.log("App connection test successful:", response)
-          this.appMessage = "App connection successful!"
-          this.isAppError = false
-          this.isAppLoading = false
-          this.connectionStatus = "connected"
+    const payload = this.buildAppPayload();
 
-          // Store connection info in localStorage for persistence
-          localStorage.setItem(
-            "lastSuccessfulConnection",
-            JSON.stringify({
-              host: payload.host,
-              port: payload.port,
-              appName: payload.appName,
-              timestamp: new Date().toISOString(),
-            }),
-          )
+    this.appConfigService.testAppConnection(payload).subscribe({
+      next: (response) => {
+        console.log("App connection test successful:", response);
+        this.appMessage = "App connection successful!";
+        this.isAppError = false;
+        this.connectionStatus = "connected";
 
-          this.showConnectionNotification(true)
-        },
-        error: (err) => {
-          console.error("App connection test failed:", err)
-          this.appMessage = "App connection failed: " + err.message
-          this.isAppError = true
-          this.isAppLoading = false
-          this.connectionStatus = "failed"
+        localStorage.setItem(
+          "lastSuccessfulConnection",
+          JSON.stringify({
+            host: payload.host,
+            port: payload.port,
+            appName: payload.appName,
+            timestamp: new Date().toISOString(),
+          })
+        );
 
-          this.showConnectionNotification(false)
-        },
-      })
-    }
+        this.showConnectionNotification(true);
+
+        // ✅ NOW navigate after success
+        this.router.navigate(["/app-scenarios"]);
+      },
+      error: (err) => {
+        console.error("App connection test failed:", err);
+        this.appMessage = "App connection failed: " + err.message;
+        this.isAppError = true;
+        this.connectionStatus = "failed";
+        this.showConnectionNotification(false);
+      },
+      complete: () => {
+        this.isAppLoading = false;
+      }
+    });
   }
+}
 
   testAppProxyConnection() {
     const val = this.appConfigForm.value
@@ -514,7 +615,7 @@ export class DatabaseconfigComponent implements OnInit {
           this.message = "Connection successful! Configuration stored."
           this.isError = false
           this.isLoading = false
-          this.router.navigate(["/SCENARIOS"]) // Navigate to /SCENARIOS on success
+          this.router.navigate(["/dashboard"]) // Navigate to /SCENARIOS on success
         },
         error: (err) => {
           console.error("Connection test failed:", err)

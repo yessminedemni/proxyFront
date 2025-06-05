@@ -29,18 +29,8 @@ export class AppConfigService {
     return this.http.post(`${this.apiUrl}/app-config`, payload).pipe(catchError(this.handleError))
   }
 
-  testAppConnection(config: any): Observable<any> {
-    // Ensure all values have the correct types before sending
-    const payload = {
-      ...config,
-      // Ensure port is sent as a string to match backend expectations
-      port: config.port ? config.port.toString() : null,
-      // Include other fields that might need type conversion
-    }
+  
 
-    console.log("Testing app connection with:", payload)
-    return this.http.post(`${this.apiUrl}/test-app-connection`, payload).pipe(catchError(this.handleError))
-  }
 
   testAppProxyConnection(config: any): Observable<any> {
     // Ensure all values have the correct types before sending
@@ -85,6 +75,8 @@ export class AppConfigService {
     const config = { name, enabled };
     return this.http.post(`${this.apiUrl}/update-scenario`, config).pipe(catchError(this.handleError));
   }
-  
+  testAppConnection(payload: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/test-app-connection`, payload);
+}
   
 }
