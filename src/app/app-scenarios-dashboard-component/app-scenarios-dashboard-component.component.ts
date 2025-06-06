@@ -1986,4 +1986,49 @@ throw new Error('Method not implemented.')
         return ""
     }
   }
+  getHealthCardClass(metricType: string): string {
+    const status = this.getHealthStatus(metricType)
+    return `health-${status.toLowerCase()}`
+  }
+
+  getHealthIconClass(metricType: string): string {
+    const status = this.getHealthStatus(metricType)
+    return `health-icon health-${status.toLowerCase()}`
+  }
+
+  getHealthStatusClass(metricType: string): string {
+    const status = this.getHealthStatus(metricType)
+    return `status-${status.toLowerCase()}`
+  }
+
+  getHealthStatus(metricType: string): string {
+    let value = 0
+
+    switch (metricType) {
+      case "cpu":
+        value = this.getLatestMetricValue("cpuLoad")
+        return value < 50 ? "Excellent" : value < 70 ? "Good" : value < 85 ? "Warning" : "Critical"
+
+      case "traffic":
+        value = this.getLatestMetricValue("trafficLoad")
+        return value < 500 ? "Excellent" : value < 800 ? "Good" : value < 1000 ? "Warning" : "Critical"
+
+      case "response":
+        value = this.getLatestMetricValue("responseTime")
+        return value < 100 ? "Excellent" : value < 300 ? "Good" : value < 500 ? "Warning" : "Critical"
+
+      case "memory":
+        value = this.getLatestMetricValue("memoryLoad")
+        return value < 60 ? "Excellent" : value < 75 ? "Good" : value < 85 ? "Warning" : "Critical"
+      case "Service Down":
+        value = this.getLatestMetricValue("trafficLoad")
+        return value < 50 ? "Excellent" : value < 70 ? "Good" : value < 1000 ? "Warning" : "Critical"
+
+
+      default:
+        return "Good"
+    }
+  }
+
+ 
 }

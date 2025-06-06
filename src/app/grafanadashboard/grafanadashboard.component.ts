@@ -8,7 +8,7 @@ import { HttpClientModule } from "@angular/common/http"
 import { RouterModule } from "@angular/router"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
-import { PrometheusService } from "../services/PrometheusService .service"
+import  { PrometheusService } from "../services/PrometheusService .service"
 
 interface MetricCard {
   id: string
@@ -451,6 +451,78 @@ export class GrafanadashboardComponent implements OnInit, AfterViewInit, OnDestr
   getCurrentMetricValue(card: MetricCard): number {
     if (card.data.values.length === 0) return 0
     return card.data.values[card.data.values.length - 1]
+  }
+
+  // Get metric value by ID for health score calculation
+  getMetricValue(metricId: string): number {
+    const card = this.metricCards.find((c) => c.id === metricId)
+    if (!card) return 0
+    return this.getCurrentMetricValue(card)
+  }
+
+  // Calculate overall health score based on all six metrics
+  getOverallHealthScore(): number {
+    const cpuUsage = this.getMetricValue("cpu")
+    const heapMemory = this.getMetricValue("heapMemory")
+    const nonHeapMemory = this.getMetricValue("nonHeapMemory")
+    const threadCount = this.getMetricValue("thread")
+    const gcCollection = this.getMetricValue("gcCollection")
+    const loadedClasses = this.getMetricValue("classes")
+
+    // Calculate weighted health score
+    const cpuScore = Math.max(0, 100 - cpuUsage * 1.4) // 1.4 points per 1% CPU usage
+    const heapScore = Math.max(0, 100 - heapMemory / 10) // 10 points per 100MB heap usage
+    const nonHeapScore = Math.max(0, 100 - nonHeapMemory / 5) // 20 points per 100MB non-heap usage
+    const threadScore = Math.max(0, 100 - threadCount / 2) // 50 points per 100 threads
+    const gcScore = Math.max(0, 100 - gcCollection * 10) // 10 points per second of GC time
+    const classesScore = Math.max(0, 100 - loadedClasses / 200) // 50 points per 10000 classes
+
+    return Math.round((cpuScore + heapScore + nonHeapScore + threadScore + gcScore + classesScore) / 6)
+  }
+
+  // Get health status based on overall score
+  getHealthStatus(): { status: string; color: string; bgColor: string } {
+    const score = this.getOverallHealthScore()
+
+    if (score >= 80) {
+      return { status: "Excellent", color: "#10b981", bgColor: "#ecfdf5" }
+    } else if (score >= 60) {
+      return { status: "Good", color: "#3b82f6", bgColor: "#eff6ff" }
+    } else if (score >= 40) {
+      return { status: "Warning", color: "#f59e0b", bgColor: "#fffbeb" }
+    } else {
+      return { status: "Critical", color: "#ef4444", bgColor: "#fef2f2" }
+    }
+  }
+
+  // Get health card class for styling
+  getHealthCardClass(): string {
+    const score = this.getOverallHealthScore()
+
+    if (score >= 80) {
+      return "health-excellent"
+    } else if (score >= 60) {
+      return "health-good"
+    } else if (score >= 40) {
+      return "health-warning"
+    } else {
+      return "health-critical"
+    }
+  }
+
+  // Get individual metric health status
+  getMetricHealthStatus(card: MetricCard): { status: string; color: string } {
+    if (!card.thresholds) return { status: "Unknown", color: "#6b7280" }
+
+    const currentValue = this.getCurrentMetricValue(card)
+
+    if (currentValue >= card.thresholds.critical) {
+      return { status: "Critical", color: "#ef4444" }
+    } else if (currentValue >= card.thresholds.warning) {
+      return { status: "Warning", color: "#f59e0b" }
+    } else {
+      return { status: "Normal", color: "#10b981" }
+    }
   }
 
   // Get the trend of a metric

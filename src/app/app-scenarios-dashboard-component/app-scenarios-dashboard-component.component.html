@@ -10,79 +10,139 @@
     </div>
   </div>
 
-  <header class="dashboard-header">
-    <div class="header-title">
-      <h1><i class="fas fa-chart-bar" aria-hidden="true"></i> App Scenarios Dashboard</h1>
-      <div class="refresh-indicator" [class.active]="loading">
-        <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
-        <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
-      </div>
-    </div>
-    
-    <div class="dashboard-actions">
-      <button 
-        (click)="exportPDF()" 
-        class="btn btn-primary export-button" 
-        [disabled]="loading"
-        aria-label="Export as PDF">
-        <i class="fas fa-file-pdf" aria-hidden="true"></i> 
-        <span>Export as PDF</span>
-      </button>
-      
-      <div class="navigation-links">
-        <a [routerLink]="['/app-scenarios']" class="nav-link">
-          <i class="fas fa-rocket" aria-hidden="true"></i> 
-          <span>App Scenarios</span>
-        </a>
-        <a [routerLink]="['/metrics']" class="nav-link">
-          <i class="fas fa-chart-line" aria-hidden="true"></i> 
-          <span>JVM Metrics</span>
-        </a>
-      </div>
-    </div>
-  </header>
-  
-  <div class="search-section">
-    <div class="search-container">
-      <i class="fas fa-search search-icon" aria-hidden="true"></i>
+  <!-- Modern Banner Header -->
+  <div class="dashboard-banner">
+    <h1 class="banner-title">APP Scenarios</h1>
+    <p class="banner-subtitle">Monitor and analyze application performance scenarios in real-time</p>
+    <div class="banner-search">
+      <i class="fas fa-search banner-search-icon" aria-hidden="true"></i>
       <input
         type="text"
         [(ngModel)]="searchTerm"
-        placeholder="Search diagrams..."
-        aria-label="Search diagrams"
-        class="search-input"
+        placeholder="Search metrics..."
+        aria-label="Search metrics"
+        class="banner-search-input"
       />
       <button 
         *ngIf="searchTerm" 
         (click)="searchTerm = ''" 
-        class="clear-search" 
+        class="banner-search-clear" 
         aria-label="Clear search">
         <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </div>
   </div>
+
+  <!-- Dashboard Actions -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-title">
+        <div class="refresh-indicator" [class.active]="loading">
+          <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
+          <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
+        </div>
+      </div>
+      
+      <div class="dashboard-actions">
+        <button 
+          (click)="exportPDF()" 
+          class="btn btn-primary" 
+          [disabled]="loading"
+          aria-label="Export as PDF">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> 
+          <span>Export PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Health Overview -->
+  <section class="overview-section">
+    <div class="overview-header">
+      <h2 class="overview-title">
+        <i class="fas fa-heartbeat"></i>
+        System Health Overview
+      </h2>
+    </div>
+    
+    <div class="health-grid">
+      <div class="health-card" [ngClass]="getHealthCardClass('cpu')">
+        <div class="health-header">
+          <h3 class="health-title">CPU Load</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('cpu')">
+            <i class="fas fa-microchip"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getLatestMetricValue('cpuLoad') | number:'1.0-0' }}%</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('cpu')">
+          {{ getHealthStatus('cpu') }}
+        </div>
+      </div>
+
+      <div class="health-card" [ngClass]="getHealthCardClass('traffic')">
+        <div class="health-header">
+          <h3 class="health-title">Traffic Load</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('traffic')">
+            <i class="fas fa-network-wired"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getLatestMetricValue('trafficLoad') | number:'1.0-0' }}</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('traffic')">
+          {{ getHealthStatus('traffic') }}
+        </div>
+      </div>
+
+      <div class="health-card" [ngClass]="getHealthCardClass('response')">
+        <div class="health-header">
+          <h3 class="health-title">Response Time</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('response')">
+            <i class="fas fa-clock"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getLatestMetricValue('responseTime') | number:'1.0-0' }}ms</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('response')">
+          {{ getHealthStatus('response') }}
+        </div>
+      </div>
+
+      <div class="health-card" [ngClass]="getHealthCardClass('memory')">
+        <div class="health-header">
+          <h3 class="health-title">Memory Load</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('memory')">
+            <i class="fas fa-memory"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getLatestMetricValue('memoryLoad') | number:'1.0-0' }}%</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('memory')">
+          {{ getHealthStatus('memory') }}
+        </div>
+      </div>
+    </div>
+  </section>
   
+  <!-- Metrics Dashboard -->
   <div class="metrics-dashboard">
     <div
-      *ngIf="!matchesSearch('CPU Load') && !matchesSearch('Traffic Load') && !matchesSearch('Response Time')"
+      *ngIf="!matchesSearch('CPU Load') && !matchesSearch('Traffic Load') && !matchesSearch('Response Time') && !matchesSearch('Memory Load') && !matchesSearch('Service Down') && !matchesSearch('Database Down')"
       class="no-results"
     >
       <div class="no-results-icon">
         <i class="fas fa-search" aria-hidden="true"></i>
       </div>
       <h3 class="no-results-title">No results found</h3>
-      <p class="no-results-message">No diagrams found matching "{{ searchTerm }}"</p>
-      <button (click)="searchTerm = ''" class="btn btn-outline reset-search">Clear Search</button>
+      <p class="no-results-message">No metrics found matching "{{ searchTerm }}"</p>
+      <button (click)="searchTerm = ''" class="btn btn-outline">Clear Search</button>
     </div>
 
     <div class="metrics-grid">
+      <!-- CPU Load -->
       <div class="metric-card" *ngIf="matchesSearch('CPU Load')" data-metric="cpu">
         <div class="metric-header">
           <h3 class="metric-title">
             <i class="fas fa-microchip metric-icon" aria-hidden="true"></i>
             CPU Load
-            <span class="status-badge" [class.active]="metrics.scenarioStates?.cpuLoad">
-              {{ metrics.scenarioStates?.cpuLoad ? 'Active' : 'Inactive' }}
+            <span class="status-badge" [class.active]="getScenarioState('cpu_load')">
+              {{ getScenarioState('cpu_load') ? 'Active' : 'Inactive' }}
             </span>
           </h3>
           <div class="metric-actions">
@@ -94,13 +154,14 @@
         </div>
       </div>
 
+      <!-- Traffic Load -->
       <div class="metric-card" *ngIf="matchesSearch('Traffic Load')" data-metric="traffic">
         <div class="metric-header">
           <h3 class="metric-title">
             <i class="fas fa-network-wired metric-icon" aria-hidden="true"></i>
             Traffic Load
-            <span class="status-badge" [class.active]="metrics.scenarioStates?.highLoad">
-              {{ metrics.scenarioStates?.highLoad ? 'Active' : 'Inactive' }}
+            <span class="status-badge" [class.active]="getScenarioState('high_load')">
+              {{ getScenarioState('high_load') ? 'Active' : 'Inactive' }}
             </span>
           </h3>
           <div class="metric-actions">
@@ -112,13 +173,14 @@
         </div>
       </div>
 
+      <!-- Response Time -->
       <div class="metric-card" *ngIf="matchesSearch('Response Time')" data-metric="response">
         <div class="metric-header">
           <h3 class="metric-title">
             <i class="fas fa-clock metric-icon" aria-hidden="true"></i>
             Response Time
-            <span class="status-badge" [class.active]="metrics.scenarioStates?.return404">
-              {{ metrics.scenarioStates?.return404 ? 'Active' : 'Inactive' }}
+            <span class="status-badge" [class.active]="getScenarioState('return_404')">
+              {{ getScenarioState('return_404') ? 'Active' : 'Inactive' }}
             </span>
           </h3>
           <div class="metric-actions">
@@ -130,13 +192,14 @@
         </div>
       </div>
 
+      <!-- Memory Load -->
       <div class="metric-card" *ngIf="matchesSearch('Memory Load')" data-metric="memory">
         <div class="metric-header">
           <h3 class="metric-title">
             <i class="fas fa-memory metric-icon" aria-hidden="true"></i>
             Memory Load
-            <span class="status-badge" [class.active]="metrics.scenarioStates?.memoryLoad">
-              {{ metrics.scenarioStates?.memoryLoad ? 'Active' : 'Inactive' }}
+            <span class="status-badge" [class.active]="getScenarioState('memory_load')">
+              {{ getScenarioState('memory_load') ? 'Active' : 'Inactive' }}
             </span>
           </h3>
           <div class="metric-actions">
@@ -148,13 +211,14 @@
         </div>
       </div>
 
+      <!-- Service Down -->
       <div class="metric-card" *ngIf="matchesSearch('Service Down')" data-metric="service">
         <div class="metric-header">
           <h3 class="metric-title">
             <i class="fas fa-power-off metric-icon" aria-hidden="true"></i>
             Service Down
-            <span class="status-badge" [class.active]="metrics.scenarioStates?.serviceDown">
-              {{ metrics.scenarioStates?.serviceDown ? 'Active' : 'Inactive' }}
+            <span class="status-badge" [class.active]="getScenarioState('service_down')">
+              {{ getScenarioState('service_down') ? 'Active' : 'Inactive' }}
             </span>
           </h3>
           <div class="metric-actions">
@@ -166,13 +230,14 @@
         </div>
       </div>
 
+      <!-- Database Down -->
       <div class="metric-card" *ngIf="matchesSearch('Database Down')" data-metric="database">
         <div class="metric-header">
           <h3 class="metric-title">
             <i class="fas fa-database metric-icon" aria-hidden="true"></i>
             Database Down
-            <span class="status-badge" [class.active]="metrics.scenarioStates?.dbDown">
-              {{ metrics.scenarioStates?.dbDown ? 'Active' : 'Inactive' }}
+            <span class="status-badge" [class.active]="getScenarioState('db_down')">
+              {{ getScenarioState('db_down') ? 'Active' : 'Inactive' }}
             </span>
           </h3>
           <div class="metric-actions">

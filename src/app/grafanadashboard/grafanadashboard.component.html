@@ -10,25 +10,42 @@
     </div>
   </div>
 
-  <header class="dashboard-header">
-    <div class="header-title">
-      <h1>JVM Metrics Dashboard</h1>
-      <div class="refresh-indicator" [class.active]="loading">
-        <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
-        <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
+  <!-- Hero Header Section -->
+  <div class="hero-header">
+    <div class="hero-content">
+      <h1 class="hero-title">JVM Metrics Dashboard</h1>
+      <p class="hero-subtitle">Monitor Java Virtual Machine performance and resource utilization</p>
+      
+      <div class="search-section">
+        <div class="search-container">
+          <i class="fas fa-search search-icon" aria-hidden="true"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Search JVM metrics..."
+            aria-label="Search JVM metrics"
+            class="search-input"
+          />
+          <button 
+            *ngIf="searchTerm" 
+            (click)="searchTerm = ''" 
+            class="clear-search" 
+            aria-label="Clear search">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Controls -->
+  <div class="dashboard-controls">
+    <div class="refresh-indicator" [class.active]="loading">
+      <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
+      <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
     </div>
     
     <div class="dashboard-actions">
-      <button 
-        (click)="exportPDF()" 
-        class="btn btn-primary export-button" 
-        [disabled]="loading"
-        aria-label="Export as PDF">
-        <i class="fas fa-file-pdf" aria-hidden="true"></i> 
-        <span>Export as PDF</span>
-      </button>
-      
       <button 
         (click)="refreshData()" 
         class="btn btn-secondary refresh-button" 
@@ -37,28 +54,59 @@
         <i class="fas fa-sync-alt" aria-hidden="true"></i> 
         <span>Refresh</span>
       </button>
-    </div>
-  </header>
-  
- 
-  
-  <div class="search-section">
-    <div class="search-container">
-      <i class="fas fa-search search-icon" aria-hidden="true"></i>
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        placeholder="Search JVM metrics"
-        aria-label="Search JVM metrics"
-        class="search-input"
-      />
+      
       <button 
-        *ngIf="searchTerm" 
-        (click)="searchTerm = ''" 
-        class="clear-search" 
-        aria-label="Clear search">
-        <i class="fas fa-times" aria-hidden="true"></i>
+        (click)="exportPDF()" 
+        class="btn btn-primary export-button" 
+        [disabled]="loading"
+        aria-label="Export as PDF">
+        <i class="fas fa-file-pdf" aria-hidden="true"></i> 
+        <span>Export PDF</span>
       </button>
+    </div>
+  </div>
+
+  <!-- Health Overview Section -->
+  <div class="health-overview">
+    <div class="overview-header">
+      <h2 class="overview-title">
+        <i class="fas fa-heartbeat" aria-hidden="true"></i>
+        System Health Overview
+      </h2>
+      <div class="overall-health-score" [ngClass]="getHealthCardClass()">
+        <div class="health-score-value">{{ getOverallHealthScore() }}</div>
+        <div class="health-score-label">Health Score</div>
+        <div class="health-status" [style.color]="getHealthStatus().color">
+          {{ getHealthStatus().status }}
+        </div>
+      </div>
+    </div>
+
+    <div class="health-metrics-grid">
+      <div 
+        *ngFor="let card of metricCards" 
+        class="health-metric-card"
+        [style.border-left-color]="getMetricHealthStatus(card).color">
+        <div class="health-metric-header">
+          <h4 class="health-metric-title">{{ card.title }}</h4>
+          <div 
+            class="health-metric-status"
+            [style.color]="getMetricHealthStatus(card).color">
+            {{ getMetricHealthStatus(card).status }}
+          </div>
+        </div>
+        <div class="health-metric-value">
+          <span class="metric-current-value">{{ getCurrentMetricValue(card).toFixed(2) }}{{ card.unit }}</span>
+          <div class="metric-thresholds" *ngIf="card.thresholds">
+            <span class="threshold-warning">Warning: {{ card.thresholds.warning }}{{ card.unit }}</span>
+            <span class="threshold-critical">Critical: {{ card.thresholds.critical }}{{ card.unit }}</span>
+          </div>
+        </div>
+        <div class="health-metric-trend">
+          <i class="fas fa-chart-line" aria-hidden="true"></i>
+          <span class="trend-text">{{ getMetricTrend(card) }}</span>
+        </div>
+      </div>
     </div>
   </div>
   

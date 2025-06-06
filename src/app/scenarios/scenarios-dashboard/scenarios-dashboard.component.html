@@ -5,65 +5,122 @@
       <div class="loading-icon">
         <i class="fas fa-spinner fa-pulse"></i>
       </div>
-      <h3 class="loading-title">Generating PDF Report</h3>
-      <p class="loading-description">This may take a few moments as we prepare comprehensive analysis for each metric.</p>
+      <h3 class="loading-title">Refreshing Metrics</h3>
+      <p class="loading-description">Please wait while we fetch the latest data...</p>
     </div>
   </div>
 
-  <header class="dashboard-header">
-    <div class="header-title">
-      <h1><i class="fas fa-chart-bar" aria-hidden="true"></i> Scenarios Dashboard</h1>
-      <div class="refresh-indicator" [class.active]="loading">
-        <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
-        <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
-      </div>
-    </div>
-    
-    <div class="dashboard-actions">
-      <button 
-        (click)="exportPDF()" 
-        class="btn btn-primary export-button" 
-        [disabled]="loading"
-        aria-label="Export dashboard as PDF">
-        <i class="fas fa-file-pdf" aria-hidden="true"></i> 
-        <span>Export Dashboard as PDF</span>
-      </button>
-    </div>
-  </header>
-  
-  <div class="navigation-section">
-    <div class="nav-links">
-      <a [routerLink]="['/SCENARIOS']" class="nav-link">
-        <i class="fas fa-rocket" aria-hidden="true"></i> 
-        <span>Scenarios</span>
-      </a>
-      <a [routerLink]="['/metrics']" class="nav-link">
-        <i class="fas fa-chart-line" aria-hidden="true"></i> 
-        <span>JVM Metrics</span>
-      </a>
-    </div>
-  </div>
-  
-  <div class="search-section">
-    <div class="search-container">
-      <i class="fas fa-search search-icon" aria-hidden="true"></i>
+  <!-- Modern Banner Header -->
+  <div class="dashboard-banner">
+    <h1 class="banner-title">Network Scenarios</h1>
+    <p class="banner-subtitle">Monitor network and database scenarios performance metrics</p>
+    <div class="banner-search">
+      <i class="fas fa-search banner-search-icon" aria-hidden="true"></i>
       <input
         type="text"
         [(ngModel)]="searchTerm"
         placeholder="Search diagrams..."
         aria-label="Search diagrams"
-        class="search-input"
+        class="banner-search-input"
       />
       <button 
         *ngIf="searchTerm" 
         (click)="searchTerm = ''" 
-        class="clear-search" 
+        class="banner-search-clear" 
         aria-label="Clear search">
         <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </div>
   </div>
+
+  <!-- Dashboard Actions -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-title">
+        <div class="refresh-indicator" [class.active]="loading">
+          <i class="fas fa-sync-alt refresh-icon" aria-hidden="true"></i>
+          <span>{{ loading ? 'Refreshing...' : 'Last updated:' }} {{ lastUpdated | date:'mediumTime' }}</span>
+        </div>
+      </div>
+      
+      <div class="dashboard-actions">
+        <button 
+          (click)="exportPDF()" 
+          class="btn btn-primary" 
+          [disabled]="loading"
+          aria-label="Export as PDF">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> 
+          <span>Export PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Health Overview -->
+  <section class="overview-section">
+    <div class="overview-header">
+      <h2 class="overview-title">
+        <i class="fas fa-heartbeat"></i>
+        Network & Database Health
+      </h2>
+    </div>
+    
+    <div class="health-grid">
+      <div class="health-card" [ngClass]="getHealthCardClass('packetLoss')">
+        <div class="health-header">
+          <h3 class="health-title">Packet Loss</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('packetLoss')">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getMetricValue('packetLoss') | number:'1.1-2' }}%</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('packetLoss')">
+          {{ getHealthStatus('packetLoss') }}
+        </div>
+      </div>
+
+      <div class="health-card" [ngClass]="getHealthCardClass('latency')">
+        <div class="health-header">
+          <h3 class="health-title">Latency</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('latency')">
+            <i class="fas fa-clock"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getMetricValue('latency') | number:'1.0-0' }}ms</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('latency')">
+          {{ getHealthStatus('latency') }}
+        </div>
+      </div>
+
+      <div class="health-card" [ngClass]="getHealthCardClass('queryLoad')">
+        <div class="health-header">
+          <h3 class="health-title">Query Load</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('queryLoad')">
+            <i class="fas fa-database"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getMetricValue('queryLoad') | number:'1.0-0' }}</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('queryLoad')">
+          {{ getHealthStatus('queryLoad') }}
+        </div>
+      </div>
+
+      <div class="health-card" [ngClass]="getHealthCardClass('overall')">
+        <div class="health-header">
+          <h3 class="health-title">Overall Health</h3>
+          <div class="health-icon" [ngClass]="getHealthIconClass('overall')">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+        </div>
+        <div class="health-value">{{ getOverallHealthScore() }}%</div>
+        <div class="health-status" [ngClass]="getHealthStatusClass('overall')">
+          {{ getOverallHealthStatus() }}
+        </div>
+      </div>
+    </div>
+  </section>
   
+  <!-- Metrics Dashboard -->
   <div class="metrics-dashboard">
     <div
       *ngIf="!matchesSearch('Packet Loss') && !matchesSearch('Latency') && !matchesSearch('Query Load') && !matchesSearch('Query Blackhole') && !matchesSearch('Connection Kill') && !matchesSearch('Disk Fault')"
@@ -74,7 +131,7 @@
       </div>
       <h3 class="no-results-title">No results found</h3>
       <p class="no-results-message">No diagrams found matching "{{ searchTerm }}"</p>
-      <button (click)="searchTerm = ''" class="btn btn-outline reset-search">Clear Search</button>
+      <button (click)="searchTerm = ''" class="btn btn-outline">Clear Search</button>
     </div>
 
     <div class="metrics-grid">
@@ -191,99 +248,6 @@
           <canvas #diskFaultChart></canvas>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- PDF Export Hidden Content -->
-  <div id="pdf-content" class="pdf-content">
-    <div class="pdf-header">
-      <h1><i class="fas fa-chart-bar"></i> Scenarios Dashboard Report</h1>
-      <p class="generated-date">Report Generated: {{ lastUpdated | date:'full' }}</p>
-    </div>
-
-    <div class="pdf-summary">
-      <h2>Executive Summary</h2>
-      <p>
-        This report provides a comprehensive analysis of system performance testing scenarios
-        designed to simulate stress conditions and failure modes. The metrics presented here
-        help identify potential bottlenecks and validate system resilience.
-      </p>
-    </div>
-
-    <div class="pdf-metrics-summary">
-      <h2>Key Metrics Overview</h2>
-      <div class="metric-summary">
-        <div class="metric-item">
-          <h3><i class="fas fa-exclamation-triangle"></i> Packet Loss</h3>
-          <p class="metric-value">{{ getMetricValue('packetLoss') | number:'1.1-2' }}%</p>
-          <p class="metric-description">
-            Measures network instability between services. Values under 1% indicate good network health.
-            Current value is {{ getMetricValue('packetLoss') < 3 ? 'acceptable' : 'concerning' }}.
-          </p>
-        </div>
-
-        <div class="metric-item">
-          <h3><i class="fas fa-clock"></i> Latency</h3>
-          <p class="metric-value">{{ getMetricValue('latency') | number:'1.0-0' }} ms</p>
-          <p class="metric-description">
-            Measures artificial database delays to test system responsiveness.
-            Values under 200ms are considered optimal for interactive services.
-          </p>
-        </div>
-
-        <div class="metric-item">
-          <h3><i class="fas fa-database"></i> Query Load</h3>
-          <p class="metric-value">{{ getMetricValue('queryLoad') | number:'1.0-0' }} q/s</p>
-          <p class="metric-description">
-            Measures database query throughput under high traffic conditions.
-            Current load is at {{ (getMetricValue('queryLoad') / 500) * 100 | number:'1.0-0' }}% of maximum capacity.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="pdf-analysis">
-      <h2>Detailed Analysis</h2>
-      <h3>Packet Loss Analysis</h3>
-      <p>
-        Packet loss is a critical metric for measuring network stability. Current value of
-        {{ getMetricValue('packetLoss') | number:'1.1-2' }}% indicates
-        {{ getMetricValue('packetLoss') < 3 ? 'good network health' : 'potential network issues' }}.
-        Historical data shows a {{ getPacketLossTrend().toLowerCase() }}.
-        Recommended action: {{ getMetricValue('packetLoss') < 3 ? 'Continue monitoring' : 'Investigate network infrastructure' }}.
-      </p>
-
-      <h3>Latency Analysis</h3>
-      <p>
-        System latency is currently at {{ getMetricValue('latency') | number:'1.0-0' }} ms, which is
-        {{ getMetricValue('latency') < 200 ? 'within acceptable range' : 'above recommended threshold' }}.
-        Response time has been {{ getLatencyTrend().split(' -')[0].toLowerCase() }} over the last hour.
-        Recommended action: {{ getMetricValue('latency') < 200 ? 'Maintain current configuration' : 'Optimize database queries' }}.
-      </p>
-
-      <h3>Query Load Analysis</h3>
-      <p>
-        The system is currently processing {{ getMetricValue('queryLoad') | number:'1.0-0' }} queries per second.
-        This represents {{ (getMetricValue('queryLoad') / 500) * 100 | number:'1.0-0' }}% of the maximum tested capacity.
-        Load pattern is {{ getQueryLoadTrend().split(' -')[0].toLowerCase() }}.
-        Recommended action: {{ getMetricValue('queryLoad') > 450 ? 'Consider scaling database resources' : 'Maintain current configuration' }}.
-      </p>
-    </div>
-
-    <div class="pdf-recommendations">
-      <h2>Recommendations</h2>
-      <ul>
-        <li>Schedule regular performance testing during off-peak hours</li>
-        <li>Implement automated alerts for packet loss exceeding 3%</li>
-        <li>Review database index optimization to improve query latency</li>
-        <li>Consider load balancing strategies if query load continues to increase</li>
-        <li>Document performance baselines for future comparison</li>
-      </ul>
-    </div>
-
-    <div class="pdf-footer">
-      <p>This report is automatically generated from the Scenarios Dashboard.</p>
-      <p>For technical support, contact the system administration team.</p>
     </div>
   </div>
 </div>
